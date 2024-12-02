@@ -17,6 +17,12 @@ use App\Http\Controllers\Admin\PembayaranController;
 use App\Http\Controllers\Admin\ReservasiController;
 
 
+
+Route::get('/', function () {
+    return view('landing-page');
+});
+
+
 //Public Routes
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'loginAll'])->name('login');
