@@ -7,7 +7,7 @@ use App\Http\Controllers\Admin\ReservasiController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
-feat-frontend
+
 Route::get('/', function () {
     return view('landing-page');
 });
