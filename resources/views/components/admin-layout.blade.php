@@ -12,32 +12,40 @@
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css">
 
-    <!-- AOS CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
-    <!-- AOS JS -->
-    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     @vite(['resources/css/app.css','resources/js/app.js'])
     <title>SI Barbershop</title>
 </head>
 
+<style>
+    .content-container {
+        transition: margin-left 0.3s ease;
+        padding-left: 1rem; /* Add padding to avoid being too close to sidenav */
+        padding-top: 100px; /* Add padding to avoid being too close to top */
+    }
+    .ml-0 {
+        margin-left: 0 !important;
+    }
+    .ml-64 {
+        margin-left: 16rem; /* Adjust this value based on your sidenav width */
+    }
+
+    
+</style>
+
+
 <body class="h-full">
     <div class="min-h-full">
-        @if (!request()->is('admin/*'))
-        <x-navbar ></x-navbar>
-         @endif
+        <x-sidebar></x-sidebar>
          
         <main>
             <div class="mx-auto px-4 py-6 sm:px-6 lg:px-8">
                 {{$slot}}
             </div>
         </main>
-    @if (Request::is('/'))
-        <x-footer></x-footer>
-    @endif
+   
 </body>
-
 
 
 
@@ -186,15 +194,6 @@
         })
         }
 
-</script>
-
-<script>
-    AOS.init({
-        offset: 200, // Jarak scroll sebelum elemen muncul
-        duration: 800, // Durasi animasi dalam milidetik
-        easing: 'ease-in-out', // Jenis easing animasi
-        once: true, // Menjalankan animasi hanya sekali saat elemen muncul
-    });
 </script>
 
 </html>
