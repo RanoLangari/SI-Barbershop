@@ -9,6 +9,6 @@ class BarbermanController extends Controller
 {
     public function index()
     {
-        return view('admin.barberman');
+        return view('admin.barberman.index');
     }
 }
