@@ -34,8 +34,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/barberman', [BarbermanController::class, 'index'])->name('admin.barberman');
+    Route::post('/admin/barberman', [BarbermanController::class, 'store'])->name('admin.barberman.store');
+    Route::put('/admin/barberman/{barberman}', [BarbermanController::class, 'update'])->name('admin.barberman.update');
+    Route::delete('/admin/barberman/{barberman}', [BarbermanController::class, 'destroy'])->name('admin.barberman.destroy');
     Route::get('/admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan');
     Route::get('/admin/layanan', [LayananController::class, 'index'])->name('admin.layanan');
+    Route::post('/admin/layanan', [LayananController::class, 'store'])->name('admin.layanan.store');
+    Route::put('/admin/layanan/{layanan}', [LayananController::class, 'update'])->name('admin.layanan.update');
+    Route::delete('/admin/layanan/{layanan}', [LayananController::class, 'destroy'])->name('admin.layanan.destroy');
     Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan');
     Route::get('/admin/pembayaran', [PembayaranController::class, 'index'])->name('admin.pembayaran');
     Route::get('/admin/reservasi', [ReservasiController::class, 'index'])->name('admin.reservasi');
