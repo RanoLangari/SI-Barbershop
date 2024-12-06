@@ -9,6 +9,6 @@ class ReservasiController extends Controller
 {
     public function index()
     {
-        return view('pelanggan.reservasi');
+        return view('pelanggan.reservasi.index');
     }
 }

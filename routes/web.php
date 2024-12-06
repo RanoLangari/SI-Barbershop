@@ -16,6 +16,12 @@ use App\Http\Controllers\Admin\PelangganController;
 use App\Http\Controllers\Admin\PembayaranController;
 use App\Http\Controllers\Admin\ReservasiController;
 
+//Barberman
+use App\Http\Controllers\Barberman\DashboardController as BarbermanDashboardController;
+use App\Http\Controllers\Barberman\JadwalController as BarbermanJadwalController;
+
+//Pelanggan
+use App\Http\Controllers\Pelanggan\ReservasiController as PelangganReservasiController;
 
 
 Route::get('/', function () {
@@ -46,3 +52,24 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/pembayaran', [PembayaranController::class, 'index'])->name('admin.pembayaran');
     Route::get('/admin/reservasi', [ReservasiController::class, 'index'])->name('admin.reservasi');
 });
+
+
+
+Route::middleware(['auth', 'role:barberman'])->group(function () {
+
+    Route::get('/barberman/dashboard', [BarbermanDashboardController::class, 'index'])->name('barberman.dashboard');
+    Route::get('/barberman/jadwal', [BarbermanJadwalController::class, 'index'])->name('barberman.jadwal');
+   
+
+});
+
+
+
+
+Route::middleware(['auth', 'role:pelanggan'])->group(function () {
+
+   
+    Route::get('/pelanggan/reservasi',[PelangganReservasiController::class, 'index'])->name('pelanggan.reservasi');
+
+});
+

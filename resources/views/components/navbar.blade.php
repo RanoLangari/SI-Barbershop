@@ -14,46 +14,55 @@
              </svg>
           </button>
        </div>
-       <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
-          <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-             <li>
-                <a href="#home" 
-                   @click="activeSection = '#home'; scrollToSection('#home')" 
-                   :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#home', 'text-gray-900 dark:text-white': activeSection !== '#home' }"
-                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Home</a>
-             </li>
-             <li>
-                <a href="#layanan" 
-                   @click="activeSection = '#layanan'; scrollToSection('#layanan')" 
-                   :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#layanan', 'text-gray-900 dark:text-white': activeSection !== '#layanan' }"
-                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Layanan</a>
-             </li>
-             <li>
-                <a href="#barberman" 
-                   @click="activeSection = '#barberman'; scrollToSection('#barberman')" 
-                   :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#barberman', 'text-gray-900 dark:text-white': activeSection !== '#barberman' }"
-                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Barberman</a>
-             </li>
-             <li>
-                <a href="#booking" 
-                   @click="activeSection = '#booking'; scrollToSection('#booking')" 
-                   :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#booking', 'text-gray-900 dark:text-white': activeSection !== '#booking' }"
-                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Booking</a>
-             </li>
-             <li>
-                <a href="#tentang-kami" 
-                   @click="activeSection = '#tentang-kami'; scrollToSection('#tentang-kami')" 
-                   :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#tentang-kami', 'text-gray-900 dark:text-white': activeSection !== '#tentang-kami' }"
-                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Tentang Kami</a>
-             </li>
-             <li>
-                <a href="#kontak-kami" 
-                   @click="activeSection = '#kontak-kami'; scrollToSection('#kontak-kami')" 
-                   :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#kontak-kami', 'text-gray-900 dark:text-white': activeSection !== '#kontak-kami' }"
-                   class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Kontak Kami</a>
-             </li>
-          </ul>
-       </div>
+      <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
+         <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <li>
+           <a href="#home" 
+              @click.prevent="activeSection = '#home'; scrollToSection('#home')" 
+              :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#home', 'text-gray-900 dark:text-white': activeSection !== '#home' }"
+              class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Home</a>
+            </li>
+            <li>
+           <a href="#layanan" 
+              @click.prevent="activeSection = '#layanan'; scrollToSection('#layanan')" 
+              :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#layanan', 'text-gray-900 dark:text-white': activeSection !== '#layanan' }"
+              class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Layanan</a>
+            </li>
+            <li>
+           <a href="#barberman" 
+              @click.prevent="activeSection = '#barberman'; scrollToSection('#barberman')" 
+              :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#barberman', 'text-gray-900 dark:text-white': activeSection !== '#barberman' }"
+              class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Barberman</a>
+            </li>
+            @auth
+            <li>
+           <a href="" 
+             @click.prevent="activeSection = '#pelanggan-reservasi'; scrollToSection('#pelanggan-reservasi')" 
+             :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#pelanggan-reservasi', 'text-gray-900 dark:text-white': activeSection !== '#pelanggan-reservasi' }"
+             class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Booking</a>
+            </li>
+            @endauth
+            @guest
+            <li>
+           <a href="{{ route('login') }}" 
+             :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#pelanggan-reservasi', 'text-gray-900 dark:text-white': activeSection !== '#pelanggan-reservasi' }"
+             class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Booking</a>
+            </li>
+            @endguest
+            <li>
+           <a href="#tentang-kami" 
+              @click.prevent="activeSection = '#tentang-kami'; scrollToSection('#tentang-kami')" 
+              :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#tentang-kami', 'text-gray-900 dark:text-white': activeSection !== '#tentang-kami' }"
+              class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Tentang Kami</a>
+            </li>
+            <li>
+           <a href="#kontak-kami" 
+              @click.prevent="activeSection = '#kontak-kami'; scrollToSection('#kontak-kami')" 
+              :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#kontak-kami', 'text-gray-900 dark:text-white': activeSection !== '#kontak-kami' }"
+              class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Kontak Kami</a>
+            </li>
+         </ul>
+      </div>
     </div>
 </nav>
 
