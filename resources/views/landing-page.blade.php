@@ -156,7 +156,7 @@
 
     <div id="bookingModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4 overflow-y-auto max-h-screen">
-            <h2 class="text-2xl font-bold mb-4">Reservasi</h2>
+            <h2 class="text-2xl font-bold mb-4">Resvasi</h2>
             <form action="#" method="POST">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="mb-4">
