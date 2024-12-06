@@ -9,6 +9,6 @@ class JadwalController extends Controller
 {
     public function index()
     {
-        return view('barberman.jadwal');
+        return view('barberman.jadwal.index');
     }
 }
