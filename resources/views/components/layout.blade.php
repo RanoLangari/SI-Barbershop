@@ -25,9 +25,13 @@
 
 <body class="h-full">
     <div class="min-h-full">
-        @if (!request()->is('admin/*'))
-            <x-navbar></x-navbar>
-        @endif
+
+            @if (auth()->check() && auth()->user()->role === 'pelanggan')
+                <x-navbarpelanggan></x-navbarpelanggan>
+            @else
+                <x-navbar></x-navbar>
+            @endif
+       
 
         <main>
             <div class="mx-auto px-4 py-6 sm:px-6 lg:px-8">
