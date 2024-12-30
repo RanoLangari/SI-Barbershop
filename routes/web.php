@@ -49,8 +49,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/admin/layanan/{layanan}', [LayananController::class, 'update'])->name('admin.layanan.update');
     Route::delete('/admin/layanan/{layanan}', [LayananController::class, 'destroy'])->name('admin.layanan.destroy');
     Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan');
+    Route::post('/admin/pelanggan/store', [PelangganController::class, 'store'])->name('admin.pelanggan.store');
+    Route::put('/admin/pelanggan/{pelanggan}', [PelangganController::class, 'update'])->name('admin.pelanggan.update');
+    Route::delete('/admin/pelanggan/{pelanggan}', [PelangganController::class, 'destroy'])->name('admin.pelanggan.destroy');
     Route::get('/admin/pembayaran', [PembayaranController::class, 'index'])->name('admin.pembayaran');
     Route::get('/admin/reservasi', [ReservasiController::class, 'index'])->name('admin.reservasi');
+  
 });
 
 
