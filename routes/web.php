@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\LayananController;
 use App\Http\Controllers\Admin\PelangganController;
 use App\Http\Controllers\Admin\PembayaranController;
 use App\Http\Controllers\Admin\ReservasiController;
+use App\Http\Controllers\Admin\ProfileController;
 
 //Barberman
 use App\Http\Controllers\Barberman\DashboardController as BarbermanDashboardController;
@@ -35,6 +36,8 @@ Route::post('/login', [AuthController::class, 'loginAll'])->name('login');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/register', [AuthController::class, 'registerPelanggan'])->name('register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+
 // Admin Routes
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -54,6 +57,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/admin/pelanggan/{pelanggan}', [PelangganController::class, 'destroy'])->name('admin.pelanggan.destroy');
     Route::get('/admin/pembayaran', [PembayaranController::class, 'index'])->name('admin.pembayaran');
     Route::get('/admin/reservasi', [ReservasiController::class, 'index'])->name('admin.reservasi');
+    Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
+    Route::put('/admin/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
+  
   
 });
 
@@ -63,6 +69,8 @@ Route::middleware(['auth', 'role:barberman'])->group(function () {
 
     Route::get('/barberman/dashboard', [BarbermanDashboardController::class, 'index'])->name('barberman.dashboard');
     Route::get('/barberman/jadwal', [BarbermanJadwalController::class, 'index'])->name('barberman.jadwal');
+    Route::get('/barberman/profile', [ProfileController::class, 'index'])->name('barberman.profile');
+    Route::post('/barberman/profile/update', [ProfileController::class, 'update'])->name('barberman.profile.update');
    
 
 });
