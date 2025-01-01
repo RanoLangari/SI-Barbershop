@@ -36,7 +36,7 @@ class PelangganController extends Controller
 
         User::create($data);
 
-        return redirect()->route('admin.pelanggan')->with('success', 'Pelanggan created successfully');
+        return redirect()->route('admin.pelanggan')->with('success', 'Pelanggan berhasil ditambahkan.');
     }
 
     public function update(Request $request, User $pelanggan)
@@ -59,12 +59,12 @@ class PelangganController extends Controller
 
         $pelanggan->update($data);
 
-        return redirect()->route('admin.pelanggan')->with('update_success', 'Pelanggan updated successfully');
+        return redirect()->route('admin.pelanggan')->with('update_success', 'Pelanggan berhasil diperbarui.');
     }
 
     public function destroy(User $pelanggan)
     {
         $pelanggan->delete();
-        return redirect()->route('admin.pelanggan')->with('delete_success', 'Pelanggan deleted successfully');
+        return redirect()->route('admin.pelanggan')->with('delete_success', 'Pelanggan berhasil dihapus.');
     }
 }

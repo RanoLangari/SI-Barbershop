@@ -22,8 +22,12 @@ class LayananController extends Controller
             'detail' => 'required',
         ]);
 
-        Layanan::create($request->all());
-        return redirect()->route('admin.layanan');
+        try {
+            Layanan::create($request->all());
+            return redirect()->route('admin.layanan')->with('success', 'Layanan berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.layanan')->with('error', 'Gagal menambahkan layanan.');
+        }
     }
 
     public function update(Request $request, Layanan $layanan)
@@ -34,13 +38,21 @@ class LayananController extends Controller
             'detail' => 'required',
         ]);
 
-        $layanan->update($request->all());
-        return redirect()->route('admin.layanan');
+        try {
+            $layanan->update($request->all());
+            return redirect()->route('admin.layanan')->with('success', 'Layanan berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.layanan')->with('error', 'Gagal memperbarui layanan.');
+        }
     }
 
     public function destroy(Layanan $layanan)
     {
-        $layanan->delete();
-        return redirect()->route('admin.layanan');
+        try {
+            $layanan->delete();
+            return redirect()->route('admin.layanan')->with('success', 'Layanan berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.layanan')->with('error', 'Gagal menghapus layanan.');
+        }
     }
 }
