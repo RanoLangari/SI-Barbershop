@@ -1,19 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Barberman;
+namespace App\Http\Controllers\Pelanggan;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
     public function index()
     {
         $user = \App\Models\User::find(\Illuminate\Support\Facades\Auth::id());
-        return view('barberman.profile.index', compact('user'));
+        return view('pelanggan.profile.index', compact('user'));
     }
 
     public function update(Request $request)
@@ -45,6 +43,6 @@ class ProfileController extends Controller
         }
         $user->save();
 
-        return redirect()->route('barberman.profile')->with('success', 'Profile berhasil diperbarui');
+        return redirect()->route('pelanggan.profile')->with('success', 'Profile berhasil diperbarui');
     }
 }
