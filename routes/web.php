@@ -20,9 +20,11 @@ use App\Http\Controllers\Admin\ProfileController;
 //Barberman
 use App\Http\Controllers\Barberman\DashboardController as BarbermanDashboardController;
 use App\Http\Controllers\Barberman\JadwalController as BarbermanJadwalController;
+use App\Http\Controllers\Barberman\ProfileController as BarbermanProfileController;
 
 //Pelanggan
 use App\Http\Controllers\Pelanggan\ReservasiController as PelangganReservasiController;
+use App\Http\Controllers\Pelanggan\ProfileController as PelangganProfileController;
 
 
 Route::get('/', function () {
@@ -69,8 +71,8 @@ Route::middleware(['auth', 'role:barberman'])->group(function () {
 
     Route::get('/barberman/dashboard', [BarbermanDashboardController::class, 'index'])->name('barberman.dashboard');
     Route::get('/barberman/jadwal', [BarbermanJadwalController::class, 'index'])->name('barberman.jadwal');
-    Route::get('/barberman/profile', [ProfileController::class, 'index'])->name('barberman.profile');
-    Route::post('/barberman/profile/update', [ProfileController::class, 'update'])->name('barberman.profile.update');
+    Route::get('/barberman/profile', [BarbermanProfileController::class, 'index'])->name('barberman.profile');
+    Route::put('/barberman/profile/update', [BarbermanProfileController::class, 'update'])->name('barberman.profile.update');
    
 
 });
@@ -82,6 +84,7 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
 
    
     Route::get('/pelanggan/reservasi',[PelangganReservasiController::class, 'index'])->name('pelanggan.reservasi');
-
+    Route::get('/pelanggan/profile',[PelangganProfileController::class, 'index'])->name('pelanggan.profile');
+    Route::put('/pelanggan/profile/update',[PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
 });
 

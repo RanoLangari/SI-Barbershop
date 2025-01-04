@@ -1,4 +1,4 @@
-<x-admin-layout>
+<x-layout>
     <!-- Tambahkan link ke SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -29,7 +29,7 @@
     <section class="jarak">
         <div class="container mx-auto my-6 p-8 bg-white rounded-lg shadow-md">
             <h2 class="text-3xl font-bold leading-tight text-gray-900 mb-6">Edit Profile</h2>
-            <form id="profileForm" action="{{ route('barberman.profile.update') }}" method="POST" enctype="multipart/form-data"
+            <form id="profileForm" action="{{ route('pelanggan.profile.update') }}" method="POST" enctype="multipart/form-data"
                 class="space-y-6">
                 @csrf
                 @method('PUT')
@@ -146,4 +146,4 @@
             });
         </script>
     @endif
-</x-admin-layout>
+</x-layout>
