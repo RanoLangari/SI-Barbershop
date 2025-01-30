@@ -31,6 +31,27 @@ Route::get('/', function () {
     return view('landing-page');
 });
 
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
+Route::get('/layanan', function () {
+    return view('layanan');
+})->name('layanan');
+
+Route::get('/barberman', function () {
+    return view('barberman');
+})->name('baberman');
+
+Route::get('/reservasi', function () {
+    return view('reservasi');
+})->name('reservasi');
+
+Route::get('/kontak', function () {
+    return view('kontak');
+})->name('kontak');
+
+
 
 //Public Routes
 Route::get('/login', [AuthController::class, 'login'])->name('login');
@@ -38,6 +59,8 @@ Route::post('/login', [AuthController::class, 'loginAll'])->name('login');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/register', [AuthController::class, 'registerPelanggan'])->name('register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+
 
 
 // Admin Routes
