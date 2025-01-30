@@ -7,7 +7,7 @@
                     <!-- logo -->
                     <div class="site-logo">
                         <a href="index.html">
-                            <img src="assets/img/logo.png" alt="">
+                            <img src="/assets/img/logo.png" alt="">
                         </a>
                     </div>
                     <!-- logo -->
@@ -24,29 +24,30 @@
                                 <ul class="sub-menu">
                                     <li><a href="{{ url('/layanan') }}">Layanan</a></li>
                                     {{-- <li><a href="{{ url('/barberman') }}">Barberman</a></li> --}}
-                                    <li><a href="{{route('pelanggan.reservasi')}}">Reservasi</a></li>
+                                    <li><a href="{{ route('pelanggan.reservasi') }}">Reservasi</a></li>
                                 </ul>
                             </li>
 
                             <li class="{{ request()->is('contact') ? 'active' : '' }}"><a
                                     href="{{ url('/kontak') }}">Contact</a></li>
 
-                           
-                                <li class="menu-item-has-children">
-                                    <a href="#">{{ Auth::user()->name }}</a>
-                                    <ul class="sub-menu">
-                                        <li><a href="{{route('pelanggan.profile')}}">Profile</a></li>
-                                        <li><a href="{{ route('logout') }}"
-                                               onclick="event.preventDefault();
+
+                            <li class="menu-item-has-children">
+                                <a href="#">{{ Auth::user()->name }}</a>
+                                <ul class="sub-menu">
+                                    <li><a href="{{ route('pelanggan.profile') }}">Profile</a></li>
+                                    <li><a href="{{ route('logout') }}"
+                                            onclick="event.preventDefault();
                                                          document.getElementById('logout-form').submit();">
                                             Logout
                                         </a></li>
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                            @csrf
-                                        </form>
-                                    </ul>
-                                </li>
-                       
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                        style="display: none;">
+                                        @csrf
+                                    </form>
+                                </ul>
+                            </li>
+
                         </ul>
                     </nav>
 
