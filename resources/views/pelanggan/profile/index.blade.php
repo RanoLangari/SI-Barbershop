@@ -1,7 +1,5 @@
 <x-layout>
-    <!-- Tambahkan link ke SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+ 
     <div class="breadcrumb-section breadcrumb-bg">
         <div class="container">
             <div class="row">
@@ -52,6 +50,9 @@
         </div>
     </div>
 
+   
+    <!-- Tambahkan link ke SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Script untuk validasi -->
     <script>
