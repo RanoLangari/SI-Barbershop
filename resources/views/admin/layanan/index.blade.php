@@ -224,7 +224,7 @@
                                 <svg class="w-6 h-6 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12" />
+                                        d="M19 7H5m0 0a2 2 0 012-2h10a2 2 0 012 2m-14 0h14m-6 5v6m-4-6v6m8 0a2 2 0 01-2 2H8a2 2 0 01-2-2v-7" />
                                 </svg>
                             </button>
                             <!-- Delete Modal -->
@@ -291,9 +291,7 @@
     <div id="add-layanan-modal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative p-4 w-full max-w-md max-h-full">
-            <!-- Modal content -->
             <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                <!-- Modal header -->
                 <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
                         Tambah Layanan
@@ -309,7 +307,6 @@
                         <span class="sr-only">Close modal</span>
                     </button>
                 </div>
-                <!-- Modal body -->
                 <div class="p-4 md:p-5">
                     <form class="space-y-4" action="{{ route('admin.layanan.store') }}" method="POST">
                         @csrf
@@ -344,25 +341,114 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Show backdrop when modal opens
+        document.querySelectorAll('[data-modal-target="add-layanan-modal"]').forEach(button => {
+            button.addEventListener('click', () => {
+                backdrop.classList.remove('hidden');
+                backdrop.classList.add('block');
+            });
+        });
+
+        // Hide backdrop when modal closes
+        document.querySelectorAll('[data-modal-hide="add-layanan-modal"]').forEach(button => {
+            button.addEventListener('click', () => {
+                backdrop.classList.remove('block');
+                backdrop.classList.add('hidden');
+            });
+        });
+
+     
+
+        function showLoader() {
+            Swal.fire({
+                title: 'Loading...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+
+        @if (session('success'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: '{{ session('success') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+
+        @if (session('error'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: '{{ session('error') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+
+        @if (session('update_success'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Update Berhasil',
+                    text: '{{ session('update_success') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+
+        @if (session('update_error'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Gagal',
+                    text: '{{ session('update_error') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+
+        @if (session('delete_success'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Hapus Berhasil',
+                    text: '{{ session('delete_success') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+
+        @if (session('delete_error'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hapus Gagal',
+                    text: '{{ session('delete_error') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+    </script>
+
 </x-admin-layout>
-<!-- JavaScript to handle backdrop -->
-<script>
-    const modal = document.getElementById('add-layanan-modal');
-    const backdrop = document.getElementById('add-layanan-backdrop');
-
-    // Show backdrop when modal opens
-    document.querySelectorAll('[data-modal-target="add-layanan-modal"]').forEach(button => {
-        button.addEventListener('click', () => {
-            backdrop.classList.remove('hidden');
-            backdrop.classList.add('block');
-        });
-    });
-
-    // Hide backdrop when modal closes
-    document.querySelectorAll('[data-modal-hide="add-layanan-modal"]').forEach(button => {
-        button.addEventListener('click', () => {
-            backdrop.classList.remove('block');
-            backdrop.classList.add('hidden');
-        });
-    });
-</script>

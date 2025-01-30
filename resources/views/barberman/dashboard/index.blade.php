@@ -24,10 +24,23 @@
                </div>
                <div class="ml-4">
                    <h3 class="text-lg leading-6 font-medium text-gray-900">Total Pelanggan</h3>
-                   <p class="mt-1 text-2xl font-semibold text-gray-900">200</p>
+                   <p class="mt-1 text-2xl font-semibold text-gray-900">{{ $pelangganCount}}</p>
                </div>
                </div>
            </div>
+           <div class="bg-white shadow rounded-lg p-6 transform transition duration-500 hover:scale-105">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7v-6m0 0L3 9m9 5l9-5-9 5z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Total Barberman</h3>
+                    <p class="mt-1 text-2xl font-semibold text-gray-900"> {{$barbermanCount}}</p>
+                </div>
+            </div>
+        </div>
        </div>
    </div>
    

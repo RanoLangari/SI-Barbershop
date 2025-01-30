@@ -59,6 +59,26 @@
         }
     </style>
 
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '{{ session('success') }}',
+            });
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '{{ session('error') }}',
+            });
+        </script>
+    @endif
+
     <div id="content-container" class="content-container ml-64">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-3xl font-bold text-gray-800">Barberman</h2>
@@ -93,6 +113,16 @@
                     </th>
                     <th>
                         <span class="flex items-center">
+                            Gambar
+                            <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center">
                             Action
                             <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -108,6 +138,11 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                         <td class="font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $item->name }}</td>
                         <td>{{ $item->email }}</td>
+                        <td>
+                            @if ($item->foto)
+                                <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->name }}" class="w-16 h-16 rounded-full object-cover">
+                            @endif
+                        </td>
                         <td>
                             <!-- Edit Button -->
                             <button data-modal-target="edit-barberman-modal-{{ $item->id }}"
@@ -146,7 +181,7 @@
                                         <div class="p-4 md:p-5">
                                             <form class="space-y-4"
                                                 action="{{ route('admin.barberman.update', $item->id) }}"
-                                                method="POST">
+                                                method="POST" enctype="multipart/form-data">
                                                 @csrf
                                                 @method('PUT')
                                                 <div>
@@ -166,6 +201,12 @@
                                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                                                         required>
                                                 </div>
+                                                <div>
+                                                    <label for="foto-{{ $item->id }}"
+                                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Foto</label>
+                                                    <input type="file" name="foto" id="foto-{{ $item->id }}"
+                                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+                                                </div>
                                                 <button type="submit"
                                                     class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Update
                                                     Barberman</button>
@@ -182,7 +223,7 @@
                                 <svg class="w-6 h-6 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12" />
+                                        d="M19 7H5m0 0a2 2 0 012-2h10a2 2 0 012 2m-14 0h14m-6 5v6m-4-6v6m8 0a2 2 0 01-2 2H8a2 2 0 01-2-2v-7" />
                                 </svg>
                             </button>
 
@@ -265,7 +306,7 @@
                     </button>
                 </div>
                 <div class="p-4 md:p-5">
-                    <form class="space-y-4" action="{{ route('admin.barberman.store') }}" method="POST">
+                    <form class="space-y-4" action="{{ route('admin.barberman.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div>
                             <label for="name"
@@ -282,6 +323,12 @@
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                                 required>
                         </div>
+                        <div>
+                            <label for="foto"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Foto</label>
+                            <input type="file" name="foto" id="foto"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+                        </div>
                         <button type="submit"
                             class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Tambah
                             Barberman</button>
@@ -290,5 +337,98 @@
             </div>
         </div>
     </div>
+
+    <!-- Include SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function showLoader() {
+            Swal.fire({
+                title: 'Loading...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+
+        @if (session('success'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: '{{ session('success') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+
+        @if (session('error'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: '{{ session('error') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+
+        @if (session('update_success'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Update Berhasil',
+                    text: '{{ session('update_success') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+
+        @if (session('update_error'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Gagal',
+                    text: '{{ session('update_error') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+
+        @if (session('delete_success'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Hapus Berhasil',
+                    text: '{{ session('delete_success') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+
+        @if (session('delete_error'))
+            showLoader();
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hapus Gagal',
+                    text: '{{ session('delete_error') }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1000);
+        @endif
+    </script>
 
 </x-admin-layout>

@@ -1,55 +1,88 @@
 <x-layout>
 
-<div class="bg-white shadow-lg rounded-lg p-8">
-    <div class="border-b pb-4 mb-6">
-        <h2 class="text-3xl font-bold text-gray-900">Reservasi</h2>
+    <!-- breadcrumb-section -->
+    <div class="breadcrumb-section breadcrumb-bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2 text-center">
+                    <div class="breadcrumb-text">
+                        <p>Book Your Appointment</p>
+                        <h1>Reservation</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-        <form action="" method="POST">
-            @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <div>
-                    <label for="nama" class="block text-sm font-medium text-gray-700">Nama</label>
-                    <input type="text" class="mt-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="nama" name="nama" required>
-                </div>
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" class="mt-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="email" name="email" required>
+    <!-- end breadcrumb section -->
+
+    <!-- reservation form -->
+    <div class="reservation-form-section mt-150 mb-150">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 mb-5 mb-lg-0">
+                    <div class="form-title text-center">
+                        <h2>Make a Reservation</h2>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur, ratione! Laboriosam est,
+                            assumenda. Perferendis, quo alias quaerat aliquid. Corporis ipsum minus voluptate? Dolore,
+                            esse natus!</p>
+                    </div>
+                    <div id="form_status"></div>
+                    <div class="card shadow-lg p-4">
+                        <div class="reservation-form">
+                            <form type="POST" id="barbershop-reservation" onSubmit="return valid_datas( this );">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" placeholder="Name" name="name" id="name">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="email" class="form-control" placeholder="Email" name="email" id="email">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="tel" class="form-control" placeholder="Phone" name="phone" id="phone">
+                                        </div>
+                                        <div class="form-group">
+                                            <select class="form-control" name="service" id="service">
+                                                <option value="" disabled selected>Select Service</option>
+                                                <option value="Haircut">Haircut</option>
+                                                <option value="Shave">Shave</option>
+                                                <option value="Trim">Trim</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <select class="form-control" name="barberman" id="barberman">
+                                                <option value="" disabled selected>Select Barberman</option>
+                                                <option value="John">John</option>
+                                                <option value="Mike">Mike</option>
+                                                <option value="Steve">Steve</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="date" class="form-control" placeholder="Date" name="date" id="date">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="time" class="form-control" placeholder="Time" name="time" id="time">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" placeholder="Price" name="price" id="price">
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="token" value="FsWga4&@f6aw" />
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <div>
-                    <label for="no_telp" class="block text-sm font-medium text-gray-700">No Telp</label>
-                    <input type="text" class="mt-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="no_telp" name="no_telp" required>
-                </div>
-                <div>
-                    <label for="layanan" class="block text-sm font-medium text-gray-700">Layanan</label>
-                    <input type="text" class="mt-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="layanan" name="layanan" required>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <div>
-                    <label for="barberman" class="block text-sm font-medium text-gray-700">Barberman</label>
-                    <input type="text" class="mt-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="barberman" name="barberman" required>
-                </div>
-                <div>
-                    <label for="tanggal" class="block text-sm font-medium text-gray-700">Tanggal</label>
-                    <input type="date" class="mt-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="tanggal" name="tanggal" required>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <div>
-                    <label for="jam" class="block text-sm font-medium text-gray-700">Jam</label>
-                    <input type="time" class="mt-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="jam" name="jam" required>
-                </div>
-                <div>
-                    <label for="harga" class="block text-sm font-medium text-gray-700">Harga</label>
-                    <input type="number" class="mt-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="harga" name="harga" required>
-                </div>
-            </div>
-            <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
-        </form>
+        </div>
     </div>
-</div>
+    <!-- end reservation form -->
+
+
 
 </x-layout>
