@@ -45,7 +45,6 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -63,5 +62,10 @@ class User extends Authenticatable
     public function reservasiCustomer()
     {
         return $this->hasMany(Reservasi::class, 'id_user');
+    }
+
+    public function verifyUser()
+    {
+        return $this->hasOne(VerifyUser::class);
     }
 }

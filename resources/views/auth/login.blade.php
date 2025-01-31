@@ -19,30 +19,30 @@
             <section class="min-h-screen flex items-center justify-center bg-gray-100">
                 <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md" data-aos="fade-up">
                     <div class="flex justify-center mb-6">
-                        <img src="path/to/logo.png" alt="Logo" class="h-16 w-16">
+                        <img src="img/barber-logo.png" alt="Logo" style="width: 120px;">
                     </div>
                     <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Masuk ke Akun</h2>
                     <form id="loginform" action="{{ route('login') }}" method="POST" class="space-y-6">
                         @csrf
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" id="email" name="email" class="w-full px-3 py-2 border rounded-md" required>
+                            <input type="email" id="email" name="email"
+                                class="w-full px-3 py-2 border rounded-md" required>
                         </div>
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                            <input type="password" id="password" name="password" class="w-full px-3 py-2 border rounded-md" required>
+                            <input type="password" id="password" name="password"
+                                class="w-full px-3 py-2 border rounded-md" required>
                         </div>
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="remember" name="remember" class="h-4 w-4 border-gray-300 rounded">
-                                <label for="remember" class="ml-2 text-sm text-gray-900">Remember me</label>
-                            </div>
-                            <a href="#" class="text-sm text-blue-700 hover:text-blue-800">Forgot password?</a>
+                            <a href="#" class="text-sm text-blue-700 hover:text-blue-800">Lupa Password?</a>
                         </div>
-                        <button type="submit" class="w-full py-2 px-4 bg-blue-700 text-white rounded-md">Login</button>
+                        <button type="submit" class="w-full py-2 px-4 bg-blue-700 text-white rounded-md">Masuk</button>
                     </form>
-                    <p class="text-center mt-4">Don't have an account? <a href="#" class="text-blue-700">Sign up</a></p>
-                    <p class="text-center mt-4"><a href="{{ url('/') }}" class="text-blue-700">Back to previous page</a></p>
+                    <p class="text-center mt-4">Tidak punya akun? <a href="{{ route('register') }}"
+                            class="text-blue-700">Daftar Akun</a></p>
+                    <p class="text-center mt-4"><a href="{{ url('/') }}" class="text-blue-700">Kembali ke halaman
+                            utama</a></p>
                 </div>
             </section>
         </main>
@@ -50,20 +50,28 @@
 
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(document).ready(function () {
-            $('#loginform').on('submit', function (e) {
+        $(document).ready(function() {
+            $('#loginform').on('submit', function(e) {
                 e.preventDefault();
+                Swal.fire({
+                    title: 'Harap Tunggu',
+                    text: 'Sedang memproses login...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading(); 
+                    }
+                });
 
                 $.ajax({
                     url: $(this).attr('action'),
                     method: 'POST',
                     data: $(this).serialize(),
-                    success: function (response) {
+                    success: function(response) {
                         if (response.success) {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Login Berhasil',
-                                text: 'Mengalihkan ke dashboard...',
+                                text: response.message,
                                 timer: 2000,
                                 showConfirmButton: false,
                             }).then(() => {
@@ -73,11 +81,12 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Login Gagal',
-                                text: response.message || 'Terjadi kesalahan. Silakan coba lagi.',
+                                text: response.message ||
+                                    'Terjadi kesalahan. Silakan coba lagi.',
                             });
                         }
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         let errorMessage = 'Email atau password salah.';
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMessage = xhr.responseJSON.message;
@@ -93,4 +102,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -26,7 +26,6 @@ use App\Http\Controllers\Barberman\ProfileController as BarbermanProfileControll
 use App\Http\Controllers\Pelanggan\ReservasiController as PelangganReservasiController;
 use App\Http\Controllers\Pelanggan\ProfileController as PelangganProfileController;
 
-
 Route::get('/', function () {
     return view('landing-page');
 });
@@ -59,8 +58,7 @@ Route::post('/login', [AuthController::class, 'loginAll'])->name('login');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/register', [AuthController::class, 'registerPelanggan'])->name('register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-
+Route::get('/user/verify/{token}', [AuthController::class, 'verify'])->name('verify');
 
 
 // Admin Routes
@@ -84,8 +82,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/reservasi', [ReservasiController::class, 'index'])->name('admin.reservasi');
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::put('/admin/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
-  
-  
 });
 
 
@@ -96,8 +92,6 @@ Route::middleware(['auth', 'role:barberman'])->group(function () {
     Route::get('/barberman/jadwal', [BarbermanJadwalController::class, 'index'])->name('barberman.jadwal');
     Route::get('/barberman/profile', [BarbermanProfileController::class, 'index'])->name('barberman.profile');
     Route::put('/barberman/profile/update', [BarbermanProfileController::class, 'update'])->name('barberman.profile.update');
-   
-
 });
 
 
@@ -105,9 +99,8 @@ Route::middleware(['auth', 'role:barberman'])->group(function () {
 
 Route::middleware(['auth', 'role:pelanggan'])->group(function () {
 
-   
-    Route::get('/pelanggan/reservasi',[PelangganReservasiController::class, 'index'])->name('pelanggan.reservasi');
-    Route::get('/pelanggan/profile',[PelangganProfileController::class, 'index'])->name('pelanggan.profile');
-    Route::put('/pelanggan/profile/update',[PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
-});
 
+    Route::get('/pelanggan/reservasi', [PelangganReservasiController::class, 'index'])->name('pelanggan.reservasi');
+    Route::get('/pelanggan/profile', [PelangganProfileController::class, 'index'])->name('pelanggan.profile');
+    Route::put('/pelanggan/profile/update', [PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
+});
