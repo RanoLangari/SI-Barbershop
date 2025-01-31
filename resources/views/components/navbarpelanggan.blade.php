@@ -1,127 +1,70 @@
-<nav x-data="{ activeSection: window.location.hash || '#home' }" class="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50">
-    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Flowbite Logo" />
-            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
-        </a>
-        <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-            <button type="button"
-                class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown"
-                data-dropdown-placement="bottom">
-                <span class="sr-only">Open user menu</span>
-                <img class="w-8 h-8 rounded-full"
-                    src="https://i.pinimg.com/236x/db/01/fa/db01faf83e2b95f584a2c9d41cd77f10.jpg" alt="user photo">
-            </button>
-            <!-- Dropdown menu -->
-            <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600"
-                id="user-dropdown">
-                <div class="px-4 py-3">
-                    <span class="block text-sm text-gray-900 dark:text-white"> {{ Auth::user()->name }}</span>
-                    <span class="block text-sm  text-gray-500 truncate dark:text-gray-400">
-                        {{ Auth::user()->email }}</span>
+<!-- header -->
+<div class="top-header-area" id="sticker">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 text-center">
+                <div class="main-menu-wrap">
+                    <!-- logo -->
+                    <div class="site-logo">
+                        <a href="index.html">
+                            <img src="/assets/img/logo.png" alt="">
+                        </a>
+                    </div>
+                    <!-- logo -->
+
+                    <!-- menu start -->
+                    <nav class="main-menu">
+                        <ul>
+                            <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ url('/') }}">Home</a>
+                            </li>
+                            <li class="{{ request()->is('about') ? 'active' : '' }}"><a
+                                    href="{{ url('/about') }}">About</a></li>
+
+                            <li class="{{ request()->is('news') ? 'active' : '' }}"><a href="">Product</a>
+                                <ul class="sub-menu">
+                                    <li><a href="{{ url('/layanan') }}">Layanan</a></li>
+                                    {{-- <li><a href="{{ url('/barberman') }}">Barberman</a></li> --}}
+                                    <li><a href="{{ route('pelanggan.reservasi') }}">Reservasi</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="{{ request()->is('contact') ? 'active' : '' }}"><a
+                                    href="{{ url('/kontak') }}">Contact</a></li>
+
+
+                            <li class="menu-item-has-children">
+                                <a href="#">{{ Auth::user()->name }}</a>
+                                <ul class="sub-menu">
+                                    <li><a href="{{ route('pelanggan.profile') }}">Profile</a></li>
+                                    <li><a href="{{ route('logout') }}"
+                                            onclick="event.preventDefault();
+                                                         document.getElementById('logout-form').submit();">
+                                            Logout
+                                        </a></li>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                        style="display: none;">
+                                        @csrf
+                                    </form>
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </nav>
+
+                    <div class="mobile-menu"></div>
+                    <!-- menu end -->
                 </div>
-                <ul class="py-2" aria-labelledby="user-menu-button">
-
-                    <li>
-                        <a href="{{route ('pelanggan.profile')}}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Settings</a>
-                    </li>
-                    <li>
-                        <a href="{{ route('logout') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sign
-                            out</a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                            @csrf
-                        </form>
-                    </li>
-                </ul>
             </div>
-            <button data-collapse-toggle="navbar-user" type="button"
-                class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                aria-controls="navbar-user" aria-expanded="false">
-                <span class="sr-only">Open main menu</span>
-                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 17 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M1 1h15M1 7h15M1 13h15" />
-                </svg>
-            </button>
-        </div>
-        <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
-            <ul
-                class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                <li>
-                    <a href="#home" @click.prevent="activeSection = '#home'; scrollToSection('#home')"
-                        :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#home', 'text-gray-900 dark:text-white': activeSection !== '#home' }"
-                        class="block py-2 px-3 rounded md:bg-transparent md:p-0" aria-current="page">Home</a>
-                </li>
-                <li>
-                    <a href="#layanan" @click.prevent="activeSection = '#layanan'; scrollToSection('#layanan')"
-                        :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#layanan', 'text-gray-900 dark:text-white': activeSection !== '#layanan' }"
-                        class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:p-0 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Layanan</a>
-                </li>
-                <li>
-                    <a href="#barberman" @click.prevent="activeSection = '#barberman'; scrollToSection('#barberman')"
-                        :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#barberman', 'text-gray-900 dark:text-white': activeSection !== '#barberman' }"
-                        class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:p-0 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Barberman</a>
-                </li>
-                <li>
-                    <a href="#" @click.prevent="toggleModal()"
-                        :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#pelanggan-reservasi', 'text-gray-900 dark:text-white': activeSection !== '#pelanggan-reservasi' }"
-                        class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:p-0 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Booking</a>
-                </li>
-                <li>
-                    <a href="#tentang-kami"
-                        @click.prevent="activeSection = '#tentang-kami'; scrollToSection('#tentang-kami')"
-                        :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#tentang-kami', 'text-gray-900 dark:text-white': activeSection !== '#tentang-kami' }"
-                        class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:p-0 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Tentang
-                        Kami</a>
-                </li>
-                <li>
-                    <a href="#kontak-kami"
-                        @click.prevent="activeSection = '#kontak-kami'; scrollToSection('#kontak-kami')"
-                        :class="{ 'text-blue-700 dark:text-blue-500': activeSection === '#kontak-kami', 'text-gray-900 dark:text-white': activeSection !== '#kontak-kami' }"
-                        class="block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent md:p-0 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Kontak
-                        Kami</a>
-                </li>
-
-            </ul>
         </div>
     </div>
-</nav>
+</div>
+<!-- end header -->
 
 
-<script>
-    function scrollToSection(section) {
-        const target = document.querySelector(section);
-        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset;
-        const startPosition = window.pageYOffset;
-        const duration = 1500; // Durasi animasi dalam milidetik (ditingkatkan untuk perpindahan lebih smooth)
-        let startTime = null;
 
-        function animation(currentTime) {
-            if (startTime === null) startTime = currentTime;
-            const timeElapsed = currentTime - startTime;
-            const run = ease(timeElapsed, startPosition, targetPosition - startPosition, duration);
-            window.scrollTo(0, run);
-            if (timeElapsed < duration) requestAnimationFrame(animation);
-        }
-
-        // Fungsi easing untuk animasi (easeInOutQuad)
-        function ease(t, b, c, d) {
-            t /= d / 2;
-            if (t < 1) return c / 2 * t * t + b;
-            t--;
-            return -c / 2 * (t * (t - 2) - 1) + b;
-        }
-
-        requestAnimationFrame(animation);
+<style>
+    .main-menu ul li.active>a {
+        color: #F28123;
+        /* Change this to the desired color */
     }
-
-    function toggleModal() {
-        const modal = document.getElementById('bookingModal');
-        modal.classList.toggle('hidden');
-    }
-</script>
+</style>
