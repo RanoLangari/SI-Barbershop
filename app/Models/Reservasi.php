@@ -12,6 +12,7 @@ class Reservasi extends Model
 
     protected $table = 'reservasi';
     protected $fillable = [
+        'kategori_id',
         'id_layanan',
         'id_barberman',
         'id_user',
@@ -20,6 +21,13 @@ class Reservasi extends Model
         'tanggal_reservasi',
         'status'
     ];
+
+
+    public function kategori_layanan()
+    {
+        return $this->belongsTo(Kategori_layanan::class, 'kategori_id');
+    }
+
 
     public function layanan()
     {

@@ -6,8 +6,8 @@
             <div class="row">
                 <div class="col-lg-8 offset-lg-2 text-center">
                     <div class="breadcrumb-text">
-                        <p>Book Your Appointment</p>
-                        <h1>Reservation</h1>
+                        <p>Atur Janji Temu Anda dengan Mudah</p>
+                        <h1>Reservasi</h1>
                     </div>
                 </div>
             </div>
@@ -21,10 +21,8 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8 mb-5 mb-lg-0">
                     <div class="form-title text-center">
-                        <h2>Make a Reservation</h2>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur, ratione! Laboriosam est,
-                            assumenda. Perferendis, quo alias quaerat aliquid. Corporis ipsum minus voluptate? Dolore,
-                            esse natus!</p>
+                        <h2>Reservasi di Barbershop ZeroSeven</h2>
+                        <p>Atur janji temu Anda dengan mudah di Barbershop ZeroSeven. Kami siap memberikan pelayanan terbaik untuk Anda!</p>
                     </div>
                     <div id="form_status"></div>
                     <div class="card shadow-lg p-4">

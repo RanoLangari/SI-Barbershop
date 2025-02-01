@@ -15,10 +15,17 @@ class Layanan extends Model
         'nama',
         'harga',
         'detail',
+        'gambar',
+        'kategori_id', // Add this line
     ];
 
     public function reservasi()
     {
         return $this->hasMany(Reservasi::class, 'id_layanan');
+    }
+
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori_layanan::class, 'kategori_id');
     }
 }

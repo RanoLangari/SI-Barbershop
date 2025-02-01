@@ -112,6 +112,11 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+.owl-carousel .owl-item.active {
+  opacity: 1;
 }
 .owl-carousel .owl-item img {
   display: block;

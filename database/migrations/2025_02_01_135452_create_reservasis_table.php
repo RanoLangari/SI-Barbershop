@@ -1,3 +1,5 @@
+
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -13,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('reservasi', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('kategori_id')->constrained('kategori_layanan')->onDelete('cascade');
             $table->foreignId('id_layanan')->constrained('layanan')->onDelete('cascade');
             $table->foreignId('id_barberman')->constrained('users')->onDelete('cascade');
             $table->foreignId('id_user')->constrained('users')->onDelete('cascade');

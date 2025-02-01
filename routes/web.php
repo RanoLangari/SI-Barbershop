@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\PelangganController;
 use App\Http\Controllers\Admin\PembayaranController;
 use App\Http\Controllers\Admin\ReservasiController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\Kategori_layanan;
 
 //Barberman
 use App\Http\Controllers\Barberman\DashboardController as BarbermanDashboardController;
@@ -82,6 +83,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/reservasi', [ReservasiController::class, 'index'])->name('admin.reservasi');
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::put('/admin/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
+    Route::get('/admin/kategori_layanan', [Kategori_layanan::class, 'index'])->name('admin.kategori');
+    Route::post('/admin/kategori_layanan', [Kategori_layanan::class, 'store'])->name('admin.kategori.store');
+    Route::put('/admin/kategori_layanan/{kategori}', [Kategori_layanan::class, 'update'])->name('admin.kategori.update');
+    Route::delete('/admin/kategori_layanan/{kategori}', [Kategori_layanan::class, 'destroy'])->name('admin.kategori.destroy');
 });
 
 

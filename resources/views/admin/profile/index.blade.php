@@ -42,7 +42,7 @@
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                         <input type="email" name="email" id="email" value="{{ Auth::user()->email }}"
-                            class="form-input mt-1" required>
+                            class="form-input mt-1" readonly>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">

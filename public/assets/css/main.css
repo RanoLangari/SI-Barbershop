@@ -2078,7 +2078,7 @@ a.video-play-btn {
 }
 
 .abt-bg {
-    background-image: url(../img/abt.jpg);
+    background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLn5Y3kx9vEfAROCstkKQV-97bO6NrC-NlZBCC09IUyu3qvwdNCTP7ElXyYi9xtdvArhs&usqp=CAU);
     height: 100%;
     width: 100%;
     background-size: cover;
@@ -2170,7 +2170,7 @@ a.video-play-btn {
 }
 
 .feature-bg:after {
-    background-image: url(../img/feature-bg.jpg);
+    background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJMj-Y4av5qYHjndD21Wecy8QP7hSP9lA5Rw19vigGvqCC2ua8VGHcZXeAieG0otU5-oM&usqp=CAU);
     position: absolute;
     right: 0;
     top: 0;
@@ -2183,22 +2183,6 @@ a.video-play-btn {
     -webkit-box-shadow: 0 0 20px #cacaca;
     box-shadow: 0 0 20px #cacaca;
     border-bottom-left-radius: 5px;
-}
-
-.team-bg-1 {
-    background-image: url(../img/team/team-1.jpg);
-}
-
-.team-bg-2 {
-    background-image: url(../img/team/team-2.jpg);
-}
-
-.team-bg-3 {
-    background-image: url(../img/team/team-3.jpg);
-}
-
-.team-bg-4 {
-    background-image: url(../img/team/team-4.jpg);
 }
 
 .team-bg {

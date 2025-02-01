@@ -7,7 +7,7 @@
         <div class="row">
             <div class="col-lg-8 offset-lg-2 text-center">
                 <div class="breadcrumb-text">
-                    <p>Get 24/7 Support</p>
+                    <p>Dapatkan Dukungan 24/7</p>
                     <h1>Kontak Kami</h1>
                 </div>
             </div>
@@ -22,8 +22,8 @@
         <div class="row">
             <div class="col-lg-8 mb-5 mb-lg-0">
                 <div class="form-title">
-                    <h2>Have you any question?</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur, ratione! Laboriosam est, assumenda. Perferendis, quo alias quaerat aliquid. Corporis ipsum minus voluptate? Dolore, esse natus!</p>
+                    <h2>Ada pertanyaan?</h2>
+                    <p>Jika Anda memiliki pertanyaan atau membutuhkan bantuan, jangan ragu untuk menghubungi kami. Tim Barbershop Zeroseven siap membantu Anda!</p>
                 </div>
                  <div id="form_status"></div>
                 <div class="contact-form">
