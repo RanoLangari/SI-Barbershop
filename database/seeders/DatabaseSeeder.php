@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@mail.com',
             'password' => bcrypt('password'),
             'role' => 'admin',
+            'verified' => 1,
         ]);
 
         User::factory()->create([
@@ -34,6 +35,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'barberman@mail.com',
             'password' => bcrypt('password'),
             'role' => 'barberman',
+            'verified' => 1,
         ]);
     }
 }

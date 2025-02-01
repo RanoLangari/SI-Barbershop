@@ -20,7 +20,7 @@ class BarbermanController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required',
-            'foto' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'foto' => 'image|mimes:jpeg,png,jpg,gif,svg|max:8000',
         ]);
 
         $data = $request->all();
@@ -44,7 +44,7 @@ class BarbermanController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required',
-            'foto' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'foto' => 'image|mimes:jpeg,png,jpg,gif,svg|max:8000',
         ]);
 
         $data = $request->all();

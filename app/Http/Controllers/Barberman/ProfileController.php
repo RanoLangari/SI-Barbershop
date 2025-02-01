@@ -25,7 +25,7 @@ class ProfileController extends Controller
             'password' => 'nullable|confirmed',
             'no_telepon' => 'required',
             'alamat' => 'required',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:8000',
         ]);
 
         $user = \App\Models\User::find(\Illuminate\Support\Facades\Auth::id());
