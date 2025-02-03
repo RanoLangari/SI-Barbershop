@@ -41,6 +41,7 @@ class BarbermanController extends Controller
 
     public function update(Request $request, User $barberman)
     {
+        // dd($request->all());
         $request->validate([
             'name' => 'required',
             'email' => 'required',
