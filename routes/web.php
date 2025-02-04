@@ -109,6 +109,7 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::get('/get-layanan-by-kategori/{kategori_id}', [PelangganReservasiController::class, 'getLayananByKategori']);
     Route::get('/get-barberman', [PelangganReservasiController::class, 'getBarberman']);
     Route::post('/checkout', [PelangganReservasiController::class, 'checkout'])->name('checkout');
+    Route::post('/midtrans/notification', [PelangganReservasiController::class, 'handlePaymentNotification'])->name('midtrans.notification');
     Route::get('/pelanggan/profile', [PelangganProfileController::class, 'index'])->name('pelanggan.profile');
     Route::put('/pelanggan/profile/update', [PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
 });

@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Kategori_layanan;
 use App\Models\Layanan;
 use App\Models\User;
+use App\Models\Reservasi;
+use App\Models\Pembayaran;
 use Illuminate\Http\Request;
 use Midtrans\Config;
 use Midtrans\Snap;
+use Midtrans\Notification;
 
 class ReservasiController extends Controller
 {
@@ -50,15 +53,72 @@ class ReservasiController extends Controller
                 'gross_amount' => $request->amount,
             ],
             'customer_details' => [
-                'first_name' => 'test',
-                'last_name' => 'test',
-                'email' => 'test',
-                'phone' => 'test',
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'phone' => $request->phone,
             ],
         ];
 
         $snapToken = Snap::getSnapToken($params);
-        dd($snapToken);
+
+        // Save reservation and payment details
+        $reservasi = Reservasi::create([
+            'kategori_id' => $request->kategori_id,
+            'id_layanan' => $request->id_layanan,
+            'id_barberman' => $request->id_barberman,
+            'id_user' => $request->id_user,
+            'id_jadwal' => $request->id_jadwal,
+            'tanggal_reservasi' => $request->tanggal_reservasi,
+            'status' => 'pending'
+        ]);
+
+        Pembayaran::create([
+            'transaksi_id' => $params['transaction_details']['order_id'],
+            'status' => 'pending',
+            'jumlah' => $request->amount,
+            'metode_pembayaran' => 'midtrans',
+            'tanggal_pembayaran' => now()
+        ]);
+
         return response()->json($snapToken);
+    }
+
+    public function handlePaymentNotification(Request $request)
+    {
+        $notification = new Notification();
+
+        $transaction = $notification->transaction_status;
+        $type = $notification->payment_type;
+        $orderId = $notification->order_id;
+        $fraud = $notification->fraud_status;
+
+        $pembayaran = Pembayaran::where('transaksi_id', $orderId)->first();
+
+        if ($transaction == 'capture') {
+            if ($type == 'credit_card') {
+                if ($fraud == 'challenge') {
+                    $pembayaran->status = 'challenge';
+                } else {
+                    $pembayaran->status = 'success';
+                }
+            }
+        } elseif ($transaction == 'settlement') {
+            $pembayaran->status = 'success';
+        } elseif ($transaction == 'pending') {
+            $pembayaran->status = 'pending';
+        } elseif ($transaction == 'deny') {
+            $pembayaran->status = 'deny';
+        } elseif ($transaction == 'expire') {
+            $pembayaran->status = 'expire';
+        } elseif ($transaction == 'cancel') {
+            $pembayaran->status = 'cancel';
+        }
+
+        $pembayaran->save();
+
+        $reservasi = Reservasi::where('id_pembayaran', $pembayaran->id)->first();
+        $reservasi->status = $pembayaran->status;
+        $reservasi->save();
     }
 }
