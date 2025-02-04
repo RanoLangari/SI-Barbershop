@@ -50,6 +50,10 @@ class ReservasiController extends Controller
     public function checkout(Request $request)
     {
         try {
+            if (empty(Config::$serverKey) || empty(Config::$clientKey)) {
+                throw new \Exception('Midtrans configuration keys are not set.');
+            }
+
             $params = [
                 'transaction_details' => [
                     'order_id' => rand(),
