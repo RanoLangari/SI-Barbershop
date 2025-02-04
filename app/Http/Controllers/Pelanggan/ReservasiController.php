@@ -3,16 +3,20 @@
 namespace App\Http\Controllers\Pelanggan;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SendInvoices;
+use App\Models\Jadwal;
 use App\Models\Kategori_layanan;
 use App\Models\Layanan;
 use App\Models\User;
 use App\Models\Reservasi;
 use App\Models\Pembayaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Notification;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class ReservasiController extends Controller
 {
@@ -54,44 +58,84 @@ class ReservasiController extends Controller
                 throw new \Exception('Midtrans configuration keys are not set.');
             }
 
+            $orderId = 'TRX' . time();
+
             $params = [
                 'transaction_details' => [
-                    'order_id' => rand(),
-                    'gross_amount' => $request->amount,
+                    'order_id' => $orderId,
+                    'gross_amount' => Layanan::find($request->id_layanan)->harga,
                 ],
                 'customer_details' => [
-                    'first_name' => $request->first_name,
-                    'last_name' => $request->last_name,
-                    'email' => $request->email,
-                    'phone' => $request->phone,
+                    'name'       => $request->name,
+                    'email'      => $request->email,
+                    'phone'      => $request->phone,
                 ],
             ];
 
-            $snapToken = Snap::getSnapToken($params);
-
-            // Save reservation and payment details
-            $reservasi = Reservasi::create([
-                'kategori_id' => $request->kategori_id,
-                'id_layanan' => $request->id_layanan,
+            // dd([
+            //     'params' => $params,
+            //     'request' => $request->all(),
+            // ]);
+            $jadwal = Jadwal::create([
                 'id_barberman' => $request->id_barberman,
-                'id_user' => $request->id_user,
-                'id_jadwal' => $request->id_jadwal,
-                'tanggal_reservasi' => $request->tanggal_reservasi,
-                'status' => 'pending'
+                'tanggal' => $request->tanggal,
+                'jam_mulai' => $request->id_jadwal, // The time string "13:00"
+                'jam_selesai' => Carbon::parse($request->id_jadwal)->addHour()->format('H:i') // Add 1 hour to end time
             ]);
-
-            Pembayaran::create([
-                'transaksi_id' => $params['transaction_details']['order_id'],
-                'status' => 'pending',
-                'jumlah' => $request->amount,
+            // Create payment record
+            $pembayaran = Pembayaran::create([
+                'transaksi_id'      => $params['transaction_details']['order_id'],
+                'status'            => 'pending',
+                'jumlah'            => Layanan::find($request->id_layanan)->harga,
                 'metode_pembayaran' => 'midtrans',
                 'tanggal_pembayaran' => now()
             ]);
 
-            return response()->json($snapToken);
+            // Then create the reservation with the jadwal ID
+            $reservasi = Reservasi::create([
+                'kategori_id' => Layanan::find($request->id_layanan)->kategori_id,
+                'id_layanan' => $request->id_layanan,
+                'id_barberman' => $request->id_barberman,
+                'id_user' => $request->id_user,
+                'id_jadwal' => $jadwal->id, // Use the actual jadwal ID
+                'id_pembayaran' => $pembayaran->id,
+                'tanggal_reservasi' => $request->tanggal,
+                'status' => 'pending'
+            ]);
+
+
+            // Link payment to reservation
+            $reservasi->update(['id_pembayaran' => $pembayaran->id]);
+
+            $snapToken = Snap::getSnapToken($params);
+            // dd($snapToken);
+
+            // Save reservation and payment details
+            // $reservasi = Reservasi::create([
+            //     'kategori_id' => $request->kategori_id,
+            //     'id_layanan' => $request->id_layanan,
+            //     'id_barberman' => $request->id_barberman,
+            //     'id_user' => $request->id_user,
+            //     'id_jadwal' => $request->id_jadwal,
+            //     'tanggal_reservasi' => $request->tanggal_reservasi,
+            //     'status' => 'pending'
+            // ]);
+
+            // Pembayaran::create([
+            //     'transaksi_id' => $params['transaction_details']['order_id'],
+            //     'status' => 'pending',
+            //     'jumlah' => $request->amount,
+            //     'metode_pembayaran' => 'midtrans',
+            //     'tanggal_pembayaran' => now()
+            // ]);
+
+            $reservasi = Reservasi::where('id', $reservasi->id)->with('kategori_layanan', 'layanan', 'barberman', 'user', 'jadwal', 'pembayaran')->first();
+
+            Mail::to($reservasi->user->email)->send(new SendInvoices($reservasi));
+            return response()->json(['snapToken' => $snapToken, 'OrderId' => $orderId]);
         } catch (\Exception $e) {
             Log::error('Error during checkout: ' . $e->getMessage());
-            return response()->json(['error' => 'Access denied due to unauthorized transaction, please check client key or server key'], 401);
+            return response()->json(['error' => $e->getMessage()]);
         }
     }
 
