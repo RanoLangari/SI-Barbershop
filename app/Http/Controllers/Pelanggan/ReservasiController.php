@@ -12,12 +12,14 @@ use Illuminate\Http\Request;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Notification;
+use Illuminate\Support\Facades\Log;
 
 class ReservasiController extends Controller
 {
     public function __construct()
     {
         Config::$serverKey = config('midtrans.server_key');
+        Config::$clientKey = config('midtrans.client_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = config('midtrans.is_sanitized');
         Config::$is3ds = config('midtrans.is_3ds');
@@ -47,41 +49,46 @@ class ReservasiController extends Controller
 
     public function checkout(Request $request)
     {
-        $params = [
-            'transaction_details' => [
-                'order_id' => rand(),
-                'gross_amount' => $request->amount,
-            ],
-            'customer_details' => [
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-            ],
-        ];
+        try {
+            $params = [
+                'transaction_details' => [
+                    'order_id' => rand(),
+                    'gross_amount' => $request->amount,
+                ],
+                'customer_details' => [
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                ],
+            ];
 
-        $snapToken = Snap::getSnapToken($params);
+            $snapToken = Snap::getSnapToken($params);
 
-        // Save reservation and payment details
-        $reservasi = Reservasi::create([
-            'kategori_id' => $request->kategori_id,
-            'id_layanan' => $request->id_layanan,
-            'id_barberman' => $request->id_barberman,
-            'id_user' => $request->id_user,
-            'id_jadwal' => $request->id_jadwal,
-            'tanggal_reservasi' => $request->tanggal_reservasi,
-            'status' => 'pending'
-        ]);
+            // Save reservation and payment details
+            $reservasi = Reservasi::create([
+                'kategori_id' => $request->kategori_id,
+                'id_layanan' => $request->id_layanan,
+                'id_barberman' => $request->id_barberman,
+                'id_user' => $request->id_user,
+                'id_jadwal' => $request->id_jadwal,
+                'tanggal_reservasi' => $request->tanggal_reservasi,
+                'status' => 'pending'
+            ]);
 
-        Pembayaran::create([
-            'transaksi_id' => $params['transaction_details']['order_id'],
-            'status' => 'pending',
-            'jumlah' => $request->amount,
-            'metode_pembayaran' => 'midtrans',
-            'tanggal_pembayaran' => now()
-        ]);
+            Pembayaran::create([
+                'transaksi_id' => $params['transaction_details']['order_id'],
+                'status' => 'pending',
+                'jumlah' => $request->amount,
+                'metode_pembayaran' => 'midtrans',
+                'tanggal_pembayaran' => now()
+            ]);
 
-        return response()->json($snapToken);
+            return response()->json($snapToken);
+        } catch (\Exception $e) {
+            Log::error('Error during checkout: ' . $e->getMessage());
+            return response()->json(['error' => 'Access denied due to unauthorized transaction, please check client key or server key'], 401);
+        }
     }
 
     public function handlePaymentNotification(Request $request)
