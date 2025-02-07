@@ -61,6 +61,15 @@
 
         <!-- Responsive Card Layout -->
         <div class="row" id="reservationContainer">
+
+            @if ($RiwayatReservasi->isEmpty())
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        Anda belum memiliki riwayat reservasi.
+                    </div>
+                </div>
+            @endif
+
             @foreach ($RiwayatReservasi as $reservasi)
                 <div class="col-md-4 mb-4 reservation-item fade-in">
                     <div class="card reservation-card h-100">
@@ -72,7 +81,8 @@
                                     {{ $reservasi->jadwal->jam_mulai }}
                                 </h5>
                             </div>
-                            <p class="card-text"><strong>Kategori:</strong> {{ $reservasi->kategori_layanan->nama }}</p>
+                            <p class="card-text"><strong>Kategori:</strong> {{ $reservasi->kategori_layanan->nama }}
+                            </p>
                             <p class="card-text"><strong>Layanan:</strong> {{ $reservasi->layanan->nama }}</p>
                             <p class="card-text"><strong>Barberman:</strong> {{ $reservasi->barberman->name }}</p>
                             <p class="card-text">
