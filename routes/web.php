@@ -26,6 +26,7 @@ use App\Http\Controllers\Barberman\ProfileController as BarbermanProfileControll
 //Pelanggan
 use App\Http\Controllers\Pelanggan\ReservasiController as PelangganReservasiController;
 use App\Http\Controllers\Pelanggan\ProfileController as PelangganProfileController;
+use App\Http\Controllers\Pelanggan\RiwayatController;
 
 Route::get('/', function () {
     return view('landing-page');
@@ -111,5 +112,6 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::post('/checkout', [PelangganReservasiController::class, 'checkout'])->name('checkout');
     Route::post('/midtrans/notification', [PelangganReservasiController::class, 'handlePaymentNotification'])->name('midtrans.notification');
     Route::get('/pelanggan/profile', [PelangganProfileController::class, 'index'])->name('pelanggan.profile');
+    Route::get('/pelanggan/riwayat', [RiwayatController::class, 'index'])->name('pelanggan.riwayat');
     Route::put('/pelanggan/profile/update', [PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
 });

@@ -19,6 +19,7 @@ class Reservasi extends Model
         'id_jadwal',
         'id_pembayaran',
         'tanggal_reservasi',
+        'snap_token',
         'status'
     ];
 

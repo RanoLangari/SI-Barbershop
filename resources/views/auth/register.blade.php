@@ -78,6 +78,7 @@
                                 icon: 'success',
                                 title: 'Registrasi Berhasil',
                                 text: 'Email verifikasi telah dikirim. Silakan cek email Anda.',
+                                timer: 2000,
                                 showConfirmButton: false,
                             }).then(() => {
                                 window.location.href = response.redirect;
