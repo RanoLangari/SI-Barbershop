@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\AuthController;
 //Admin
 use App\Http\Controllers\Admin\BarbermanController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\JadwalController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\LayananController;
 use App\Http\Controllers\Admin\PelangganController;
@@ -88,6 +89,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/kategori_layanan', [Kategori_layanan::class, 'store'])->name('admin.kategori.store');
     Route::put('/admin/kategori_layanan/{kategori}', [Kategori_layanan::class, 'update'])->name('admin.kategori.update');
     Route::delete('/admin/kategori_layanan/{kategori}', [Kategori_layanan::class, 'destroy'])->name('admin.kategori.destroy');
+    Route::get('/admin/jadwal', [JadwalController::class, 'index'])->name('admin.jadwal');
+    Route::post('/admin/jadwal', [JadwalController::class, 'store'])->name('admin.jadwal.store');
+    Route::put('/admin/jadwal/{jadwal}', [JadwalController::class, 'update'])->name('admin.jadwal.update');
+    Route::delete('/admin/jadwal/{jadwal}', [JadwalController::class, 'destroy'])->name('admin.jadwal.destroy');
 });
 
 
@@ -109,6 +114,7 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::get('/pelanggan/reservasi', [PelangganReservasiController::class, 'index'])->name('pelanggan.reservasi');
     Route::get('/get-layanan-by-kategori/{kategori_id}', [PelangganReservasiController::class, 'getLayananByKategori']);
     Route::get('/get-barberman', [PelangganReservasiController::class, 'getBarberman']);
+    Route::get('/get-barberman-schedule/{barbermanId}', [PelangganReservasiController::class, 'getBarbermanSchedule']);
     Route::post('/checkout', [PelangganReservasiController::class, 'checkout'])->name('checkout');
     Route::post('/midtrans/notification', [PelangganReservasiController::class, 'handlePaymentNotification'])->name('midtrans.notification');
     Route::get('/pelanggan/profile', [PelangganProfileController::class, 'index'])->name('pelanggan.profile');

@@ -34,7 +34,8 @@ class ReservasiController extends Controller
         $Barberman = User::where('role', 'barberman')->get();
         $Kategori = Kategori_layanan::all();
         $Layanan = Layanan::with('kategori')->get();
-        return view('pelanggan.reservasi.index', compact('Barberman', 'Kategori', 'Layanan'));
+        $Jadwal = Jadwal::with('barberman')->get();
+        return view('pelanggan.reservasi.index', compact('Barberman', 'Kategori', 'Layanan', 'Jadwal'));
     }
 
     public function getLayananByKategori(Request $request)
@@ -49,6 +50,37 @@ class ReservasiController extends Controller
             ->select('id', 'name', 'foto', 'no_telepon')
             ->get();
         return response()->json($barberman);
+    }
+
+    public function getBarbermanSchedule(Request $request, $barbermanId)
+    {
+        $jadwal = Jadwal::where('id_barberman', $barbermanId)
+            ->where('tanggal', $request->tanggal)
+            ->get(['jam_mulai', 'jam_selesai']);
+
+        // Get all possible time slots (9:00 - 21:00) with 2-hour intervals
+        $allTimeSlots = [];
+        for ($hour = 9; $hour < 21; $hour += 2) {
+            $timeSlot = sprintf("%02d:00", $hour);
+            $allTimeSlots[$timeSlot] = true;
+        }
+
+        // Mark booked slots as unavailable
+        foreach ($jadwal as $j) {
+            $start = Carbon::parse($j->jam_mulai)->format('H:i');
+            $allTimeSlots[$start] = false;
+        }
+
+        // Convert to array format for response
+        $availableSlots = [];
+        foreach ($allTimeSlots as $time => $available) {
+            $availableSlots[] = [
+                'time' => $time,
+                'available' => $available
+            ];
+        }
+
+        return response()->json($availableSlots);
     }
 
     public function checkout(Request $request)
