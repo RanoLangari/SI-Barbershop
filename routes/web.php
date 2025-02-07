@@ -116,8 +116,10 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::get('/get-barberman', [PelangganReservasiController::class, 'getBarberman']);
     Route::get('/get-barberman-schedule/{barbermanId}', [PelangganReservasiController::class, 'getBarbermanSchedule']);
     Route::post('/checkout', [PelangganReservasiController::class, 'checkout'])->name('checkout');
-    Route::post('/midtrans/notification', [PelangganReservasiController::class, 'handlePaymentNotification'])->name('midtrans.notification');
+    Route::get('/midtrans/notification', [PelangganReservasiController::class, 'handlePaymentNotification'])->name('midtrans.notification');
     Route::get('/pelanggan/profile', [PelangganProfileController::class, 'index'])->name('pelanggan.profile');
     Route::get('/pelanggan/riwayat', [RiwayatController::class, 'index'])->name('pelanggan.riwayat');
+    Route::post('/pelanggan/riwayat/pay/{reservasi}', [RiwayatController::class, 'pay'])->name('pelanggan.riwayat.pay');
+    Route::post('/pelanggan/riwayat/cancel/{reservasi}', [RiwayatController::class, 'cancel'])->name('pelanggan.riwayat.cancel');
     Route::put('/pelanggan/profile/update', [PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
 });

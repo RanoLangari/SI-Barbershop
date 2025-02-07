@@ -62,11 +62,11 @@
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-3xl font-bold text-gray-800">Jadwal Barberman</h2>
             <!-- Modal toggle -->
-            <button data-modal-target="add-jadwal-modal" data-modal-toggle="add-jadwal-modal"
+            {{-- <button data-modal-target="add-jadwal-modal" data-modal-toggle="add-jadwal-modal"
                 class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 type="button">
                 Tambah Jadwal
-            </button>
+            </button> --}}
         </div>
         <table id="export-table" class="table-auto w-full">
             <thead>
@@ -74,8 +74,8 @@
                     <th>
                         <span class="flex items-center">
                             Nama Barberman
-                            <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
                             </svg>
@@ -111,7 +111,7 @@
                             </svg>
                         </span>
                     </th>
-                    <th>
+                    {{-- <th>
                         <span class="flex items-center">
                             Action
                             <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -120,7 +120,7 @@
                                     stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
                             </svg>
                         </span>
-                    </th>
+                    </th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -132,7 +132,7 @@
                         <td>{{ $jadwal->tanggal }}</td>
                         <td>{{ $jadwal->jam_mulai }}</td>
                         <td>{{ $jadwal->jam_selesai }}</td>
-                        <td>
+                        {{-- <td>
                             <!-- Edit Button -->
                             <button data-modal-target="edit-jadwal-modal-{{ $jadwal->id }}"
                                 data-modal-toggle="edit-jadwal-modal-{{ $jadwal->id }}"
@@ -154,7 +154,7 @@
                                         d="M19 7H5m0 0a2 2 0 012-2h10a2 2 0 012 2m-14 0h14m-6 5v6m-4-6v6m8 0a2 2 0 01-2 2H8a2 2 0 01-2-2v-7" />
                                 </svg>
                             </button>
-                        </td>
+                        </td> --}}
                     </tr>
 
                     <!-- Edit Jadwal Modal -->
@@ -172,9 +172,8 @@
                                         data-modal-hide="edit-jadwal-modal-{{ $jadwal->id }}">
                                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                             fill="none" viewBox="0 0 14 14">
-                                            <path stroke="currentColor" stroke-linecap="round"
-                                                stroke-linejoin="round" stroke-width="2"
-                                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                                         </svg>
                                         <span class="sr-only">Close modal</span>
                                     </button>

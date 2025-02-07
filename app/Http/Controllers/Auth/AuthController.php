@@ -63,7 +63,7 @@ class AuthController extends Controller
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
-            'no_telp' => 'required|numeric',
+            'no_telepon' => 'required|numeric',
             'alamat' => 'required',
         ]);
 

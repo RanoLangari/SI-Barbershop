@@ -152,7 +152,8 @@
                             </div>
                         </div>
                         <div class="text-center mt-4">
-                            <button type="button" id="pay-button" class="btn btn-primary btn-lg" style="display: none;">
+                            <button type="button" id="pay-button" class="btn btn-primary btn-lg"
+                                style="display: none;">
                                 Bayar Sekarang
                             </button>
                         </div>
@@ -204,12 +205,12 @@
                                          onclick="selectService(this, ${layanan.id})">
                                         <div class="d-flex align-items-center gap-3">
                                             ${layanan.gambar ? `
-                                                                                                                                                                                                                                <div class="service-image rounded overflow-hidden" 
-                                                                                                                                                                                                                                     style="width: 80px; height: 80px; margin-right: 10px;">
-                                                                                                                                                                                                                                    <img src="/storage/${layanan.gambar}" alt="${layanan.nama}" 
-                                                                                                                                                                                                                                         class="w-100 h-100" style="object-fit: cover;">
-                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                            ` : ''}
+                                                                                                                                                                                                                                                                                                                                                <div class="service-image rounded overflow-hidden" 
+                                                                                                                                                                                                                                                                                                                                                     style="width: 80px; height: 80px; margin-right: 10px;">
+                                                                                                                                                                                                                                                                                                                                                    <img src="/storage/${layanan.gambar}" alt="${layanan.nama}" 
+                                                                                                                                                                                                                                                                                                                                                         class="w-100 h-100" style="object-fit: cover;">
+                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                            ` : ''}
                                             <div class="service-info flex-grow-1">
                                                 <h5 class="mb-1">${layanan.nama}</h5>
                                                 <p class="text-muted mb-2" style="font-size: 1rem;">${layanan.detail}</p>
@@ -268,17 +269,17 @@
                                  onclick="selectBarberman(this, ${barberman.id})">
                                 <div class="d-flex align-items-center gap-3">
                                     ${barberman.foto ? `
-                                                                                                                                                                                                                        <div class="barberman-image rounded-circle overflow-hidden" 
-                                                                                                                                                                                                                             style="width: 80px; height: 80px; margin-right:15px;">
-                                                                                                                                                                                                                            <img src="/storage/${barberman.foto}" alt="${barberman.name}" 
-                                                                                                                                                                                                                                 class="w-100 h-100" style="object-fit: cover;">
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                    ` : `
-                                                                                                                                                                                                                        <div class="barberman-image rounded-circle bg-primary d-flex align-items-center justify-content-center"
-                                                                                                                                                                                                                             style="width: 80px; height: 80px;">
-                                                                                                                                                                                                                            <i class="fas fa-user-tie fa-2x text-white"></i>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                    `}
+                                                                                                                                                                                                                                                                                                                                        <div class="barberman-image rounded-circle overflow-hidden" 
+                                                                                                                                                                                                                                                                                                                                             style="width: 80px; height: 80px; margin-right:15px;">
+                                                                                                                                                                                                                                                                                                                                            <img src="/storage/${barberman.foto}" alt="${barberman.name}" 
+                                                                                                                                                                                                                                                                                                                                                 class="w-100 h-100" style="object-fit: cover;">
+                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                    ` : `
+                                                                                                                                                                                                                                                                                                                                        <div class="barberman-image rounded-circle bg-primary d-flex align-items-center justify-content-center"
+                                                                                                                                                                                                                                                                                                                                             style="width: 80px; height: 80px;">
+                                                                                                                                                                                                                                                                                                                                            <i class="fas fa-user-tie fa-2x text-white"></i>
+                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                    `}
                                     <div class="barberman-info flex-grow-1">
                                         <h5 class="mb-1">${barberman.name}</h5>
                                     </div>
@@ -383,8 +384,25 @@
             formData.append('tanggal', document.getElementById('tanggal').value);
 
             const checkedTime = document.querySelector('input[name="id_jadwal"]:checked');
+            const selectedDate = new Date(document.getElementById('tanggal').value + 'T' + checkedTime.value +
+                ':00');
+            const now = new Date();
+            const timeDifference = (selectedDate - now) / (1000 * 60 * 60); // difference in hours
+
             if (!checkedTime) {
-                Swal.fire('Perhatian', 'Silakan pilih jam reservasi terlebih dahulu.', 'warning');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Pilih Jadwal',
+                    text: 'Silakan pilih jadwal reservasi terlebih dahulu',
+                });
+                return;
+            }
+            if (timeDifference < 2) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Waktu Reservasi Tidak Valid',
+                    text: 'Reservasi harus dilakukan minimal 2 jam sebelum setelah waktu sekarang',
+                });
                 return;
             }
             formData.append('id_jadwal', checkedTime.value);
@@ -401,8 +419,57 @@
                 .then(result => {
                     console.log(result);
                     if (result.snapToken) {
-                        console.log(result.snapToken);
-                        snap.pay(result.snapToken);
+                        snap.pay(result.snapToken, {
+                            onSuccess: function(result) {
+                                Swal.fire({
+                                    title: 'Pembayaran Berhasil!',
+                                    text: 'Reservasi Anda telah dikonfirmasi. Silakan cek email Anda untuk invoice.',
+                                    icon: 'success',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                }).then(() => {
+                                    window.location.href =
+                                        `/midtrans/notification?order_id=${result.order_id}&status_code=${result.status_code}&transaction_status=${result.transaction_status}&payment_type=${result.payment_type}`;
+                                });
+                            },
+                            onPending: function(result) {
+                                console.log(result);
+                                Swal.fire({
+                                    title: 'Pembayaran Pending',
+                                    text: 'Silakan selesaikan pembayaran Anda sesuai instruksi yang diberikan',
+                                    icon: 'warning',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                }).then(() => {
+                                    window.location.href =
+                                        `/midtrans/notification?order_id=${result.order_id}&status_code=${result.status_code}&transaction_status=${result.transaction_status}`;
+                                });
+                            },
+                            onError: function(result) {
+                                console.log(result);
+                                Swal.fire({
+                                    title: 'Pembayaran Gagal',
+                                    text: 'Terjadi kesalahan dalam proses pembayaran',
+                                    icon: 'error',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                }).then(() => {
+                                    window.location.href =
+                                        `/midtrans/notification?order_id=${result.order_id}&status_code=${result.status_code}&transaction_status=${result.transaction_status}`;
+                                });
+                            },
+                            onClose: function() {
+                                Swal.fire({
+                                    title: 'Pembayaran Ditunda',
+                                    text: 'Silahkan Ke Halaman Riwayat Reservasi Untuk Melanjutkan Pembayaran',
+                                    icon: 'info',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                }).then(() => {
+                                    window.location.href = '/pelanggan/riwayat';
+                                });
+                            }
+                        });
                     } else if (result.error) {
                         Swal.fire('Gagal', result.error, 'error');
                     }

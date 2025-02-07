@@ -22,7 +22,6 @@ return new class extends Migration
             $table->foreignId('id_jadwal')->constrained('jadwal')->onDelete('cascade');
             $table->foreignId('id_pembayaran')->constrained('pembayaran')->onDelete('cascade');
             $table->dateTime('tanggal_reservasi');
-            $table->string('snap_token');
             $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled']);
             $table->timestamps();
 
