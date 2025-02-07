@@ -38,8 +38,8 @@
                         required>
                 </div>
                 <div>
-                    <label for="no_telp" class="block text-sm font-medium text-gray-700">No. Telepon</label>
-                    <input type="number" id="no_telp" name="no_telp" class="w-full px-3 py-2 border rounded-md"
+                    <label for="no_telepon" class="block text-sm font-medium text-gray-700">No. Telepon</label>
+                    <input type="number" id="no_telepon" name="no_telepon" class="w-full px-3 py-2 border rounded-md"
                         required>
                 </div>
                 <div>
@@ -78,6 +78,7 @@
                                 icon: 'success',
                                 title: 'Registrasi Berhasil',
                                 text: 'Email verifikasi telah dikirim. Silakan cek email Anda.',
+                                timer: 2000,
                                 showConfirmButton: false,
                             }).then(() => {
                                 window.location.href = response.redirect;

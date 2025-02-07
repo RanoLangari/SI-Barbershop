@@ -36,6 +36,7 @@
                                 <a href="#">{{ Auth::user()->name }}</a>
                                 <ul class="sub-menu">
                                     <li><a href="{{ route('pelanggan.profile') }}">Profile</a></li>
+                                    <li><a href="{{ route('pelanggan.riwayat') }}">Riwayat Reservasi</a></li>
                                     <li><a href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
                                                          document.getElementById('logout-form').submit();">

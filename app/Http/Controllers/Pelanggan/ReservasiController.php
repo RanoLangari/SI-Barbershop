@@ -34,7 +34,8 @@ class ReservasiController extends Controller
         $Barberman = User::where('role', 'barberman')->get();
         $Kategori = Kategori_layanan::all();
         $Layanan = Layanan::with('kategori')->get();
-        return view('pelanggan.reservasi.index', compact('Barberman', 'Kategori', 'Layanan'));
+        $Jadwal = Jadwal::with('barberman')->get();
+        return view('pelanggan.reservasi.index', compact('Barberman', 'Kategori', 'Layanan', 'Jadwal'));
     }
 
     public function getLayananByKategori(Request $request)
@@ -49,6 +50,37 @@ class ReservasiController extends Controller
             ->select('id', 'name', 'foto', 'no_telepon')
             ->get();
         return response()->json($barberman);
+    }
+
+    public function getBarbermanSchedule(Request $request, $barbermanId)
+    {
+        $jadwal = Jadwal::where('id_barberman', $barbermanId)
+            ->where('tanggal', $request->tanggal)
+            ->get(['jam_mulai', 'jam_selesai']);
+
+        // Get all possible time slots (9:00 - 21:00) with 2-hour intervals
+        $allTimeSlots = [];
+        for ($hour = 9; $hour < 21; $hour += 2) {
+            $timeSlot = sprintf("%02d:00", $hour);
+            $allTimeSlots[$timeSlot] = true;
+        }
+
+        // Mark booked slots as unavailable
+        foreach ($jadwal as $j) {
+            $start = Carbon::parse($j->jam_mulai)->format('H:i');
+            $allTimeSlots[$start] = false;
+        }
+
+        // Convert to array format for response
+        $availableSlots = [];
+        foreach ($allTimeSlots as $time => $available) {
+            $availableSlots[] = [
+                'time' => $time,
+                'available' => $available
+            ];
+        }
+
+        return response()->json($availableSlots);
     }
 
     public function checkout(Request $request)
@@ -72,6 +104,7 @@ class ReservasiController extends Controller
                 ],
             ];
 
+            $snapToken = Snap::getSnapToken($params);
             // dd([
             //     'params' => $params,
             //     'request' => $request->all(),
@@ -87,7 +120,7 @@ class ReservasiController extends Controller
                 'transaksi_id'      => $params['transaction_details']['order_id'],
                 'status'            => 'pending',
                 'jumlah'            => Layanan::find($request->id_layanan)->harga,
-                'metode_pembayaran' => 'midtrans',
+                'metode_pembayaran' => '-',
                 'tanggal_pembayaran' => now()
             ]);
 
@@ -106,32 +139,8 @@ class ReservasiController extends Controller
 
             // Link payment to reservation
             $reservasi->update(['id_pembayaran' => $pembayaran->id]);
-
-            $snapToken = Snap::getSnapToken($params);
-            // dd($snapToken);
-
-            // Save reservation and payment details
-            // $reservasi = Reservasi::create([
-            //     'kategori_id' => $request->kategori_id,
-            //     'id_layanan' => $request->id_layanan,
-            //     'id_barberman' => $request->id_barberman,
-            //     'id_user' => $request->id_user,
-            //     'id_jadwal' => $request->id_jadwal,
-            //     'tanggal_reservasi' => $request->tanggal_reservasi,
-            //     'status' => 'pending'
-            // ]);
-
-            // Pembayaran::create([
-            //     'transaksi_id' => $params['transaction_details']['order_id'],
-            //     'status' => 'pending',
-            //     'jumlah' => $request->amount,
-            //     'metode_pembayaran' => 'midtrans',
-            //     'tanggal_pembayaran' => now()
-            // ]);
-
             $reservasi = Reservasi::where('id', $reservasi->id)->with('kategori_layanan', 'layanan', 'barberman', 'user', 'jadwal', 'pembayaran')->first();
 
-            Mail::to($reservasi->user->email)->send(new SendInvoices($reservasi));
             return response()->json(['snapToken' => $snapToken, 'OrderId' => $orderId]);
         } catch (\Exception $e) {
             Log::error('Error during checkout: ' . $e->getMessage());
@@ -139,41 +148,68 @@ class ReservasiController extends Controller
         }
     }
 
+
+
+
     public function handlePaymentNotification(Request $request)
     {
-        $notification = new Notification();
+        try {
+            $orderId = $request->query('order_id');
+            $transactionStatus = $request->query('transaction_status');
 
-        $transaction = $notification->transaction_status;
-        $type = $notification->payment_type;
-        $orderId = $notification->order_id;
-        $fraud = $notification->fraud_status;
-
-        $pembayaran = Pembayaran::where('transaksi_id', $orderId)->first();
-
-        if ($transaction == 'capture') {
-            if ($type == 'credit_card') {
-                if ($fraud == 'challenge') {
-                    $pembayaran->status = 'challenge';
-                } else {
-                    $pembayaran->status = 'success';
-                }
+            if (!$orderId || !$transactionStatus) {
+                throw new \Exception('Invalid notification data received');
             }
-        } elseif ($transaction == 'settlement') {
-            $pembayaran->status = 'success';
-        } elseif ($transaction == 'pending') {
-            $pembayaran->status = 'pending';
-        } elseif ($transaction == 'deny') {
-            $pembayaran->status = 'deny';
-        } elseif ($transaction == 'expire') {
-            $pembayaran->status = 'expire';
-        } elseif ($transaction == 'cancel') {
-            $pembayaran->status = 'cancel';
+
+            Log::info('Payment notification received', [
+                'order_id' => $orderId,
+                'status' => $transactionStatus
+            ]);
+
+            // Find pembayaran by transaction ID
+            $pembayaran = Pembayaran::where('transaksi_id', $orderId)->first();
+
+            if (!$pembayaran) {
+                throw new \Exception("Payment with order ID {$orderId} not found");
+            }
+
+            // Update payment status
+            switch ($transactionStatus) {
+                case 'settlement':
+                    $pembayaran->status = 'completed';
+                    $pembayaran->metode_pembayaran = $request->query('payment_type');
+                    break;
+                case 'pending':
+                    $pembayaran->status = 'pending';
+                    break;
+                case 'deny':
+                case 'expire':
+                case 'cancel':
+                    // hapus jadwal, pembayaran, dan reservasi
+                    $reservasi = Reservasi::where('id_pembayaran', $pembayaran->id)->first();
+                    if ($reservasi) {
+                        $reservasi->delete();
+                    }
+                    $jadwal = Jadwal::where('id', $reservasi->id_jadwal)->first();
+                    if ($jadwal) {
+                        $jadwal->delete();
+                    }
+                    $pembayaran->delete();
+                    break;
+            }
+
+            $pembayaran->save();
+
+            // Update related reservation status if needed
+            if ($pembayaran->status == 'completed') {
+                $pembayaran->reservasi()->update(['status' => 'confirmed']);
+            }
+
+            Mail::to($pembayaran->reservasi->user->email)->send(new SendInvoices($pembayaran->reservasi));
+            return redirect()->route('pelanggan.riwayat')->with('success', 'Reservasi berhasil dibuat');
+        } catch (\Exception $e) {
+            Log::error('Payment notification error: ' . $e->getMessage());
+            return redirect()->route('pelanggan.riwayat')->with('error', 'Terjadi kesalahan saat memproses pembayaran');
         }
-
-        $pembayaran->save();
-
-        $reservasi = Reservasi::where('id_pembayaran', $pembayaran->id)->first();
-        $reservasi->status = $pembayaran->status;
-        $reservasi->save();
     }
 }
