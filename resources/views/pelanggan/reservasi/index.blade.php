@@ -433,7 +433,6 @@
                                 });
                             },
                             onPending: function(result) {
-                                console.log(result);
                                 Swal.fire({
                                     title: 'Pembayaran Pending',
                                     text: 'Silakan selesaikan pembayaran Anda sesuai instruksi yang diberikan',
@@ -446,7 +445,6 @@
                                 });
                             },
                             onError: function(result) {
-                                console.log(result);
                                 Swal.fire({
                                     title: 'Pembayaran Gagal',
                                     text: 'Terjadi kesalahan dalam proses pembayaran',
