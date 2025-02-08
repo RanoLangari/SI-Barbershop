@@ -203,9 +203,9 @@ class ReservasiController extends Controller
             // Update related reservation status if needed
             if ($pembayaran->status == 'completed') {
                 $pembayaran->reservasi()->update(['status' => 'confirmed']);
+                Mail::to($pembayaran->reservasi->user->email)->send(new SendInvoices($pembayaran->reservasi));
             }
 
-            Mail::to($pembayaran->reservasi->user->email)->send(new SendInvoices($pembayaran->reservasi));
             return redirect()->route('pelanggan.riwayat')->with('success', 'Reservasi berhasil dibuat');
         } catch (\Exception $e) {
             Log::error('Payment notification error: ' . $e->getMessage());

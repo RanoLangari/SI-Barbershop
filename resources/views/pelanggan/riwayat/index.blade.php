@@ -158,10 +158,28 @@
                         if (data.snapToken) {
                             snap.pay(data.snapToken, {
                                 onSuccess: function(result) {
-                                    window.location.reload();
+                                    Swal.fire({
+                                        title: 'Pembayaran Berhasil!',
+                                        text: 'Reservasi Anda telah dikonfirmasi. Silakan cek email Anda untuk invoice.',
+                                        icon: 'success',
+                                        showConfirmButton: false,
+                                        timer: 2000,
+                                    }).then(() => {
+                                        window.location.href =
+                                            `/midtrans/notification?order_id=${result.order_id}&status_code=${result.status_code}&transaction_status=${result.transaction_status}&payment_type=${result.payment_type}`;
+                                    });
                                 },
                                 onPending: function(result) {
-                                    window.location.reload();
+                                    Swal.fire({
+                                        title: 'Pembayaran Pending',
+                                        text: 'Silakan selesaikan pembayaran Anda sesuai instruksi yang diberikan',
+                                        icon: 'warning',
+                                        showConfirmButton: false,
+                                        timer: 2000,
+                                    }).then(() => {
+                                        window.location.href =
+                                            `/midtrans/notification?order_id=${result.order_id}&status_code=${result.status_code}&transaction_status=${result.transaction_status}`;
+                                    });
                                 },
                                 onError: function(result) {
                                     Swal.fire({
@@ -170,6 +188,9 @@
                                         icon: 'error',
                                         showConfirmButton: false,
                                         timer: 2000
+                                    }).then(() => {
+                                        window.location.href =
+                                            `/midtrans/notification?order_id=${result.order_id}&status_code=${result.status_code}&transaction_status=${result.transaction_status}`;
                                     });
                                 },
                                 onClose: function() {

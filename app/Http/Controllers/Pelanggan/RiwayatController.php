@@ -30,10 +30,11 @@ class RiwayatController extends Controller
 
     public function pay(Reservasi $reservasi)
     {
+        $newOrderId = 'TRX' . time();
         try {
             $params = [
                 'transaction_details' => [
-                    'order_id' => $reservasi->pembayaran->transaksi_id,
+                    'order_id' => $newOrderId,
                     'gross_amount' => $reservasi->pembayaran->jumlah,
                 ],
                 'customer_details' => [
@@ -42,6 +43,11 @@ class RiwayatController extends Controller
                     'phone' => $reservasi->user->no_telepon,
                 ],
             ];
+
+            $reservasi->pembayaran->update(['transaksi_id' => $newOrderId]);
+            $reservasi->update(['status' => 'pending']);
+            $reservasi->pembayaran->save();
+            $reservasi->save();
 
             $snapToken = Snap::getSnapToken($params);
             return response()->json(['snapToken' => $snapToken]);
