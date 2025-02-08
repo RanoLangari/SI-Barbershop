@@ -44,7 +44,7 @@ class RiwayatController extends Controller
                 ],
             ];
 
-            $reservasi->pembayaran->update(['order_id' => $newOrderId]);
+            $reservasi->pembayaran->update(['transaksi_id' => $newOrderId]);
             $reservasi->update(['status' => 'pending']);
             $reservasi->pembayaran->save();
             $reservasi->save();
