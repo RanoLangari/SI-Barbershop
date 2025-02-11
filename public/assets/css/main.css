@@ -501,7 +501,7 @@ a.cart-btn {
 }
 
 .breadcrumb-bg {
-    background-image: url(../img/breadcrumb-bg.jpg);
+    background-image: url(../img/newbreadcrumb-bg.jpeg);
 }
 
 .breadcrumb-text p {
@@ -1392,7 +1392,7 @@ a.mobile-show.search-bar-icon:hover {
 
 ----------------------------------------------------------------------------- */
 .hero-bg {
-    background-image: url(../img/hero-bg.jpg);
+    background-image: url(../img/newhero-bg.jpeg);
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
