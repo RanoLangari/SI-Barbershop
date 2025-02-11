@@ -75,6 +75,12 @@
                             </p>
                             <p class="card-text"><strong>Layanan:</strong> {{ $reservasi->layanan->nama }}</p>
                             <p class="card-text"><strong>Barberman:</strong> {{ $reservasi->barberman->name }}</p>
+                            @if ($reservasi->pembayaran)
+                                <p class="card-text">
+                                    <strong>Metode Pembayaran:</strong>
+                                    {{ ucfirst($reservasi->pembayaran->metode_pembayaran ?? 'Belum dibayar') }}
+                                </p>
+                            @endif
                             <p class="card-text">
                                 <strong>Status:</strong>
                                 @if ($reservasi->status == 'pending')
@@ -82,27 +88,164 @@
                                     <div class="mt-2">
                                         <button class="btn btn-primary btn-sm pay-button"
                                             data-id="{{ $reservasi->id }}">
-                                            Bayar Sekarang
+                                            <i class="fas fa-money-bill-wave"></i> Bayar Sekarang
                                         </button>
                                         <button class="btn btn-danger btn-sm cancel-button"
                                             data-id="{{ $reservasi->id }}">
-                                            Batalkan
+                                            <i class="fas fa-times"></i> Batalkan
                                         </button>
                                     </div>
                                 @elseif ($reservasi->status == 'confirmed')
                                     <span class="badge badge-success">Pembayaran Berhasil</span>
-                                @elseif ($reservasi->status == 'canceled')
-                                    <span class="badge badge-danger">Dibatalkan</span>
-                                @elseif ($reservasi->status == 'done')
-                                    <span class="badge badge-primary">Selesai</span>
+                                    @php
+                                        $reservationDate = \Carbon\Carbon::parse($reservasi->tanggal_reservasi)->format(
+                                            'Y-m-d',
+                                        );
+                                        $reservationDateTime = \Carbon\Carbon::parse(
+                                            $reservationDate . ' ' . $reservasi->jadwal->jam_mulai,
+                                        );
+                                    @endphp
+
+                                    @if (now()->lt($reservationDateTime->copy()->subHour()))
+                                        <div class="mt-2">
+                                            @php
+                                                // Cari refund record berdasarkan reservation id
+                                                $refundRecord = $Refund->firstWhere('reservasi.id', $reservasi->id);
+                                            @endphp
+
+                                            @if ($reservasi->pembayaran)
+                                                @if ($refundRecord)
+                                                    @if ($refundRecord->status == 'pending')
+                                                        <span class="badge badge-warning">Permohonan Refund
+                                                            Sedang Diproses</span>
+                                                    @elseif($refundRecord->status == 'failed')
+                                                        <span class="badge badge-danger">Refund Ditolak</span>
+                                                    @elseif($refundRecord->status == 'success')
+                                                        <div class="d-flex flex-column align-items-start">
+                                                            <span class="badge badge-success mb-2">Refund
+                                                                Diterima</span>
+                                                            @if ($refundRecord->bukti)
+                                                                <button
+                                                                    class="btn btn-secondary btn-sm view-proof-button"
+                                                                    data-bukti-id="{{ $reservasi->id }}">
+                                                                    <i class="fas fa-eye"></i> Lihat Bukti
+                                                                </button>
+
+                                                                <script>
+                                                                    document.querySelector('[data-bukti-id="{{ $reservasi->id }}"]').addEventListener('click', function() {
+                                                                        Swal.fire({
+                                                                            title: 'Bukti Refund',
+                                                                            imageUrl: '{{ asset('uploads/refund/' . $refundRecord->bukti) }}',
+                                                                            imageAlt: 'Bukti Refund',
+                                                                            showCloseButton: true,
+                                                                            showConfirmButton: false,
+                                                                        });
+                                                                    });
+                                                                </script>
+                                                            @endif
+                                                        </div>
+                                                    @endif
+                                                @else
+                                                    <button class="btn btn-info btn-sm refund-button"
+                                                        data-id="{{ $reservasi->id }}">
+                                                        <i class="fas fa-undo-alt"></i> Ajukan Refund
+                                                    </button>
+                                                @endif
+                                            @endif
+                                        </div>
+
+                                        <script>
+                                            document.querySelector('[data-id="{{ $reservasi->id }}"]').addEventListener('click', function() {
+                                                Swal.fire({
+                                                    title: 'Ajukan Refund',
+                                                    html: `
+                                                        <form id="refundForm{{ $reservasi->id }}">
+                                                            <div class="form-group">
+                                                                <label for="merchant" class="text-left d-block mb-2">Pilih Merchant</label>
+                                                                <select class="form-control" id="merchant" name="merchant" required>
+                                                                    <option value="">Pilih Merchant</option>
+                                                                    <option value="BRI">BANK BRI</option>
+                                                                    <option value="BNI">BANK BNI</option>
+                                                                    <option value="Dana">Dana</option>
+                                                                    <option value="OVO">OVO</option>
+                                                                    <option value="GoPay">GoPay</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="address_refund" class="text-left d-block mb-2">Nomor Rekening/Nomor Telepon</label>
+                                                                <input type="text" class="form-control" id="address_refund" name="address_refund" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="address_name" class="text-left d-block mb-2">Nama Pemilik Rekening/Akun</label>
+                                                                <input type="text" class="form-control" id="address_name" name="address_name" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="alasan" class="text-left d-block mb-2">Alasan Refund</label>
+                                                                <textarea class="form-control" id="alasan" name="alasan" rows="3" required></textarea>
+                                                            </div>
+                                                        </form>
+                                                    `,
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Ajukan Refund',
+                                                    cancelButtonText: 'Batal',
+                                                    preConfirm: () => {
+                                                        const alasan = document.getElementById('alasan').value;
+                                                        if (!alasan) {
+                                                            Swal.showValidationMessage('Alasan refund harus diisi');
+                                                            return false;
+                                                        }
+                                                        return alasan;
+                                                    }
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        const formData = new FormData();
+                                                        formData.append('id_reservasi', '{{ $reservasi->id }}');
+                                                        formData.append('id_pembayaran',
+                                                            '{{ $reservasi->pembayaran ? $reservasi->pembayaran->id : '' }}');
+                                                        formData.append('alasan', result.value);
+                                                        formData.append('merchant', document.getElementById('merchant').value);
+                                                        console.log(document.getElementById('merchant').value);
+                                                        formData.append('address_refund', document.getElementById('address_refund').value);
+                                                        formData.append('address_name', document.getElementById('address_name').value);
+
+                                                        formData.append('_token', '{{ csrf_token() }}');
+                                                        Swal.fire({
+                                                            title: 'Harap Tunggu',
+                                                            text: 'Sedang mengajukan refund...',
+                                                            allowOutsideClick: false,
+                                                            didOpen: () => {
+                                                                Swal.showLoading();
+                                                            }
+                                                        });
+
+                                                        fetch('{{ route('pelanggan.refund', $reservasi->id) }}', {
+                                                                method: 'POST',
+                                                                body: formData
+                                                            })
+                                                            .then(response => response.json())
+                                                            .then(data => {
+                                                                if (data.status === 'success') {
+                                                                    Swal.fire('Berhasil!', 'Pengajuan refund telah dikirim', 'success')
+                                                                        .then(() => {
+                                                                            window.location.reload();
+                                                                        });
+                                                                } else {
+                                                                    Swal.fire('Error!', 'Terjadi kesalahan', 'error');
+                                                                }
+                                                            });
+                                                    }
+                                                });
+                                            });
+                                        </script>
+                                    @elseif ($reservasi->status == 'canceled')
+                                        <span class="badge badge-danger">
+                                            Dibatalkan</span>
+                                    @elseif ($reservasi->status == 'done')
+                                        <span class="badge badge-primary">Selesai</span>
+                                    @endif
                                 @endif
                             </p>
-                            @if ($reservasi->pembayaran)
-                                <p class="card-text">
-                                    <strong>Metode Pembayaran:</strong>
-                                    {{ ucfirst($reservasi->pembayaran->metode_pembayaran ?? 'Belum dibayar') }}
-                                </p>
-                            @endif
+
                         </div>
                     </div>
                 </div>

@@ -18,7 +18,7 @@ use App\Http\Controllers\Admin\PembayaranController;
 use App\Http\Controllers\Admin\ReservasiController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\Kategori_layanan;
-
+use App\Http\Controllers\Admin\RefundController as AdminRefundController;
 //Barberman
 use App\Http\Controllers\Barberman\DashboardController as BarbermanDashboardController;
 use App\Http\Controllers\Barberman\JadwalController as BarbermanJadwalController;
@@ -27,7 +27,9 @@ use App\Http\Controllers\Barberman\ProfileController as BarbermanProfileControll
 //Pelanggan
 use App\Http\Controllers\Pelanggan\ReservasiController as PelangganReservasiController;
 use App\Http\Controllers\Pelanggan\ProfileController as PelangganProfileController;
+use App\Http\Controllers\Pelanggan\RefundController as PelangganRefundController;
 use App\Http\Controllers\Pelanggan\RiwayatController;
+use App\Http\Controllers\RefundController;
 
 Route::get('/', function () {
     return view('landing-page');
@@ -93,6 +95,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/jadwal', [JadwalController::class, 'store'])->name('admin.jadwal.store');
     Route::put('/admin/jadwal/{jadwal}', [JadwalController::class, 'update'])->name('admin.jadwal.update');
     Route::delete('/admin/jadwal/{jadwal}', [JadwalController::class, 'destroy'])->name('admin.jadwal.destroy');
+    Route::get('/admin/refund', [AdminRefundController::class, 'index'])->name('admin.refund');
+    Route::put('/admin/refund/{refund}', [AdminRefundController::class, 'update'])->name('admin.refund.update');
 });
 
 
@@ -121,5 +125,6 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::get('/pelanggan/riwayat', [RiwayatController::class, 'index'])->name('pelanggan.riwayat');
     Route::post('/pelanggan/riwayat/pay/{reservasi}', [RiwayatController::class, 'pay'])->name('pelanggan.riwayat.pay');
     Route::post('/pelanggan/riwayat/cancel/{reservasi}', [RiwayatController::class, 'cancel'])->name('pelanggan.riwayat.cancel');
+    Route::post('/pelanggan/riwayat/refund/{reservasi}', [PelangganRefundController::class, 'store'])->name('pelanggan.refund');
     Route::put('/pelanggan/profile/update', [PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
 });
