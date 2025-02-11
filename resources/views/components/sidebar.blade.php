@@ -139,7 +139,7 @@
                         <span class="flex-1 ms-3 whitespace-nowrap">Data Jadwal</span>
                     </a>
                 </li>
-                <li>
+                {{-- <li>
                     <a href="{{ route('admin.reservasi') }}"
                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -150,8 +150,20 @@
                         </svg>
                         <span class="flex-1 ms-3 whitespace-nowrap">Reservasi</span>
                     </a>
-                </li>
+                </li> --}}
                 <li>
+                    <a href="{{ route('admin.refund') }}"
+                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path
+                                d="M11 19v-5.5c0-0 0-0 0-0v0H9c-0 0-0 0-0 0v5.5H4.5c-0.3 0-0.5 0.2-0.5 0.5s0.2 0.5 0.5 0.5h11c0.3 0 0.5-0.2 0.5-0.5s-0.2-0.5-0.5-0.5H11zM10 12c1.1 0 2-0.9 2-2s-0.9-2-2-2 -2 0.9-2 2S8.9 12 10 12zM15.5 0h-11C3.7 0 3 0.7 3 1.5v17C3 19.3 3.7 20 4.5 20h11c0.8 0 1.5-0.7 1.5-1.5v-17C17 0.7 16.3 0 15.5 0zM16 18.5c0 0.3-0.2 0.5-0.5 0.5h-11C4.2 19 4 18.8 4 18.5v-17C4 1.2 4.2 1 4.5 1h11C15.8 1 16 1.2 16 1.5V18.5z" />
+                        </svg>
+                        <span class="flex-1 ms-3 whitespace-nowrap">Data Refund</span>
+                    </a>
+                </li>
+                {{-- <li>
                     <a href="{{ route('admin.pembayaran') }}"
                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -164,7 +176,7 @@
                         </svg>
                         <span class="flex-1 ms-3 whitespace-nowrap">Pembayaran</span>
                     </a>
-                </li>
+                </li> --}}
                 <li>
                     <a href="{{ route('admin.pelanggan') }}"
                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">

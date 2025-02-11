@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Pelanggan;
 
 use App\Http\Controllers\Controller;
+use App\Models\Refund;
 use App\Models\Reservasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +26,10 @@ class RiwayatController extends Controller
         $RiwayatReservasi = Reservasi::where('id_user', Auth::user()->id)
             ->with(['kategori_layanan', 'layanan', 'barberman', 'jadwal', 'pembayaran'])
             ->get();
-        return view('pelanggan.riwayat.index', compact('RiwayatReservasi'));
+        $Refund = Refund::where('id_reservasi', $RiwayatReservasi->pluck('id'))
+            ->with(['reservasi', 'pembayaran'])
+            ->get();
+        return view('pelanggan.riwayat.index', compact('RiwayatReservasi', 'Refund'));
     }
 
     public function pay(Reservasi $reservasi)
