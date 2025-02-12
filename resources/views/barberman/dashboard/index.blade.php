@@ -11,7 +11,7 @@
                    </div>
                    <div class="ml-4">
                        <h3 class="text-lg leading-6 font-medium text-gray-900">Total Reservasi</h3>
-                       <p class="mt-1 text-2xl font-semibold text-gray-900">150</p>
+                       <p class="mt-1 text-2xl font-semibold text-gray-900">{{ $totalReservasi}}</p>
                    </div>
                </div>
            </div>

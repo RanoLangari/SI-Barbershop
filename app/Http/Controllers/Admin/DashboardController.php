@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Models\Pembayaran;
+use App\Models\Reservasi; // Add this line
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -13,8 +15,20 @@ class DashboardController extends Controller
         $pelangganCount = User::where('role', 'pelanggan')->count();
         $barbermanCount = User::where('role', 'barberman')->count();
 
+        $totalReservasi = Reservasi::count(); // Add this line
 
-        return view('admin.dashboard.index') ->with('pelangganCount', $pelangganCount )
-                                            ->with('barbermanCount', $barbermanCount);
+        $totalPendapatan = Pembayaran::sum('jumlah');
+        $pendapatanPerTahun = Pembayaran::whereYear('tanggal_pembayaran', date('Y'))->sum('jumlah');
+        $pendapatanPerBulan = Pembayaran::whereMonth('tanggal_pembayaran', date('m'))->sum('jumlah');
+        $pendapatanPerHari = Pembayaran::whereDay('tanggal_pembayaran', date('d'))->sum('jumlah');
+
+        return view('admin.dashboard.index')
+            ->with('pelangganCount', $pelangganCount)
+            ->with('barbermanCount', $barbermanCount)
+            ->with('totalReservasi', $totalReservasi) // Add this line
+            ->with('totalPendapatan', $totalPendapatan)
+            ->with('pendapatanPerTahun', $pendapatanPerTahun)
+            ->with('pendapatanPerBulan', $pendapatanPerBulan)
+            ->with('pendapatanPerHari', $pendapatanPerHari);
     }
 }

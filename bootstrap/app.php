@@ -4,6 +4,8 @@ use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Barryvdh\DomPDF\Facade;
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,4 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+->withProviders([
+    // ... existing providers
+    Barryvdh\DomPDF\ServiceProvider::class,
+])
+->create();
