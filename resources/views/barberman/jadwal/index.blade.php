@@ -62,103 +62,74 @@
     <div id="content-container" class="content-container ml-64">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-3xl font-bold text-gray-800">Data Jadwal Barberman</h2>
-           
         </div>
         <table id="export-table" class="table-auto w-full">
             <thead>
-            <tr>
-                <th>
-                <span class="flex items-center">
-                    No
-                    <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
-                    </svg>
-                </span>
-                </th>
-                <th>
-                <span class="flex items-center">
-                    Nama Pelanggan
-                    <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
-                    </svg>
-                </span>
-                </th>
-                <th>
-                <span class="flex items-center">
-                    Tanggal
-                    <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
-                    </svg>
-                </span>
-                </th>
-                <th>
-                <span class="flex items-center">
-                    Jam Mulai
-                    <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
-                    </svg>
-                </span>
-                </th>
-                <th>
-                <span class="flex items-center">
-                    Jam Selesai
-                    <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
-                    </svg>
-                </span>
-                </th>
-                <th>
-                <span class="flex items-center">
-                    Status
-                    <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
-                    </svg>
-                </span>
-                </th>
-            </tr>
+                <tr>
+                    <th>
+                        <span class="flex items-center">
+                            No
+                            <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                                height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center">
+                            Nama Pelanggan
+                            <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center">
+                            Tanggal
+                            <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center">
+                            Jam Mulai
+                            <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
+                            </svg>
+                        </span>
+                    </th>
+                    <th>
+                        <span class="flex items-center">
+                            Jam Selesai
+                            <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4" />
+                            </svg>
+                        </span>
+                    </th>
+                </tr>
             </thead>
             <tbody>
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
-                <td class="font-medium text-gray-900 whitespace-nowrap dark:text-white">1</td>
-                <td>John Doe</td>
-                <td>2023-10-01</td>
-                <td>10:00</td>
-                <td>11:00</td>
-                <td>Confirmed</td>
-                <td>
-                {{-- <!-- Edit Button -->
-                <a href="#" class="text-blue-600 hover:text-blue-900">
-                    <svg class="w-6 h-6 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M11 4H4a2 2 0 00-2 2v16a2 2 0 002 2h16a2 2 0 002-2v-7M16.293 3.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-11 11a1 1 0 01-.293.207l-4 1a1 1 0 01-1.262-1.262l1-4a1 1 0 01.207-.293l11-11z" />
-                    </svg>
-                </a>
-                <!-- Delete Button -->
-                <a href="#" class="text-red-600 hover:text-red-900 ml-4">
-                    <svg class="w-6 h-6 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 7H5m0 0a2 2 0 012-2h10a2 2 0 012 2m-14 0h14m-6 5v6m-4-6v6m8 0a2 2 0 01-2 2H8a2 2 0 01-2-2v-7" />
-                    </svg>
-                </a> --}}
-                </td>
-            </tr>
+                @foreach ($dataJadwal as $index => $item)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
+                        <td class="font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $index + 1 }}</td>
+                        <td>{{ $item->customer_name }}</td> <!-- Display customer's name -->
+                        <td>{{ $item->tanggal }}</td>
+                        <td>{{ $item->jam_mulai }}</td>
+                        <td>{{ $item->jam_selesai }}</td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
-
 
 </x-admin-layout>

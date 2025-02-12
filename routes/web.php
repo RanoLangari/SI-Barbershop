@@ -97,6 +97,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/admin/jadwal/{jadwal}', [JadwalController::class, 'destroy'])->name('admin.jadwal.destroy');
     Route::get('/admin/refund', [AdminRefundController::class, 'index'])->name('admin.refund');
     Route::put('/admin/refund/{refund}', [AdminRefundController::class, 'update'])->name('admin.refund.update');
+    Route::get('/admin/laporan/pdf', [LaporanController::class, 'generatePdf'])->name('admin.laporan.pdf');
 });
 
 
