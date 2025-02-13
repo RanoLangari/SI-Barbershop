@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('pembayaran', function (Blueprint $table) {
             $table->id();
             $table->string('transaksi_id');
-            $table->enum('status', ['pending', 'paid', 'failed', 'expired']);
+            $table->enum('status', ['pending', 'completed', 'cancelled']);
             $table->decimal('jumlah', 10, 2);
             $table->string('metode_pembayaran');
             $table->dateTime('tanggal_pembayaran');

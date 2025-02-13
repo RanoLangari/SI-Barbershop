@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('no_telepon')->nullable();
             $table->text('alamat')->nullable();
             $table->string('foto')->nullable();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('verified')->default(false);
             $table->rememberToken();
             $table->timestamps();
 
