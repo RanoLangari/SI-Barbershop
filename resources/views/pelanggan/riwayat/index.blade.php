@@ -110,7 +110,7 @@
                                         <div class="mt-2">
                                             @php
                                                 // Cari refund record berdasarkan reservation id
-                                                $refundRecord = $Refund->firstWhere('reservasi.id', $reservasi->id);
+                                                $refundRecord = $Refund->firstWhere('id_reservasi', $reservasi->id);
                                             @endphp
 
                                             @if ($reservasi->pembayaran)
