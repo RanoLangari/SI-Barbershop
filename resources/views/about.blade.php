@@ -98,7 +98,7 @@
 				@foreach($barberman as $barber)
 					<div class="col-lg-4 col-md-6">
 						<div class="single-team-item">
-							<div class="team-bg" style="background-image: url('{{ Storage::url($barber->foto) }}');"></div>
+							<div class="team-bg" style="background-image: url('{{ $barber->foto ? Storage::url($barber->foto) : 'https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500' }}');"></div>
 							<h4>{{ $barber->name }} <span>Barberman</span></h4>
 							<ul class="social-link-team">
 								<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>

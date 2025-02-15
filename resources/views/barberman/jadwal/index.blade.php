@@ -119,10 +119,10 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($dataJadwal as $index => $item)
+                @foreach ($jadwal as $index => $item)
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                         <td class="font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $index + 1 }}</td>
-                        <td>{{ $item->customer_name }}</td> <!-- Display customer's name -->
+                        <td>{{ $item->reservasi->first()->user->name }}</td> <!-- Display customer's name -->
                         <td>{{ $item->tanggal }}</td>
                         <td>{{ $item->jam_mulai }}</td>
                         <td>{{ $item->jam_selesai }}</td>

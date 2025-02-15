@@ -66,9 +66,9 @@
                 <th>Layanan</th>
                 <th>Barberman</th>
                 <th>Jadwal</th>
-                <th>Harga</th>
                 <th>Tanggal Reservasi</th>
                 <th>Pembayaran</th>
+                <th>Harga</th>
             </tr>
         </thead>
         <tbody>
@@ -82,12 +82,18 @@
                     <td>{{ $item->barberman->name }}</td>
                     <td>{{ $item->jadwal->tanggal }} {{ $item->jadwal->jam_mulai }} - {{ $item->jadwal->jam_selesai }}
                     </td>
-                    <td>{{ $item->layanan->harga }}</td>
                     <td>{{ $item->tanggal_reservasi }}</td>
                     <td>{{ $item->pembayaran->status }}</td>
+                    <td>{{ 'Rp ' . number_format($item->layanan->harga, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="8" style="text-align: right;"><strong>Total Pendapatan:</strong></td>
+                <td>{{ 'Rp ' . number_format($reservasi->sum('layanan.harga'), 0, ',', '.') }}</td>
+            </tr>
+        </tfoot>
     </table>
 
     <footer>
