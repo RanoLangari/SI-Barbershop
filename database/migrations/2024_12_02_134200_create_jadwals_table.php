@@ -17,6 +17,7 @@ return new class extends Migration
             $table->date('tanggal');
             $table->time('jam_mulai');
             $table->time('jam_selesai');
+            $table->boolean('status')->default(true);
             $table->timestamps();
 
             // Add indexes
