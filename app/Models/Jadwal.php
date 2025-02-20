@@ -16,6 +16,7 @@ class Jadwal extends Model
         'tanggal',
         'jam_mulai',
         'jam_selesai',
+        'status'
 
     ];
 
