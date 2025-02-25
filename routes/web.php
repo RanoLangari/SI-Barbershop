@@ -127,5 +127,6 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::post('/pelanggan/riwayat/pay/{reservasi}', [RiwayatController::class, 'pay'])->name('pelanggan.riwayat.pay');
     Route::post('/pelanggan/riwayat/cancel/{reservasi}', [RiwayatController::class, 'cancel'])->name('pelanggan.riwayat.cancel');
     Route::post('/pelanggan/riwayat/refund/{reservasi}', [PelangganRefundController::class, 'store'])->name('pelanggan.refund');
+    Route::post('/pelanggan/reschedule', [PelangganController::class, 'reschedule'])->name('pelanggan.reschedule');
     Route::put('/pelanggan/profile/update', [PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
 });
