@@ -62,7 +62,33 @@ Route::get('/', function () {
     }
 });
 
+Route::get('/about', function () {
+    try {
+        // Query the database for ulasan records with eager loading of relationships
+        $ulasanData = \App\Models\Ulasan::with(['reservasi', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
 
+        // Add detailed logging for debugging
+        Log::info('About page: Fetched ' . $ulasanData->count() . ' ulasan records');
+
+        foreach ($ulasanData as $ulasan) {
+            Log::info('Ulasan ID: ' . $ulasan->id .
+                ', User: ' . ($ulasan->user ? $ulasan->user->name : 'No user') .
+                ', Has Photo: ' . ($ulasan->user && $ulasan->user->foto ? 'Yes' : 'No') .
+                ', Review Text: ' . substr($ulasan->ulasan, 0, 30) . '...');
+        }
+
+        // Pass data explicitly to the view
+        return view('about', [
+            'ulasanData' => $ulasanData
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error on about page: ' . $e->getMessage());
+        return view('about', ['ulasanData' => collect()]);
+    }
+});
 
 Route::get('/layanan', function () {
     return view('layanan');
