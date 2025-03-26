@@ -110,7 +110,7 @@
                                         <div class="mt-2">
                                             @php
                                                 // Cari refund record berdasarkan reservation id
-                                                $refundRecord = $Refund->firstWhere('id_reservasi', $reservasi->id);
+                                                $refundRecord = $Refund->firstWhere('reservasi.id', $reservasi->id);
                                             @endphp
 
                                             @if ($reservasi->pembayaran)
@@ -446,6 +446,98 @@
                                     <span class="badge badge-primary">Selesai</span>
                                 @endif
                             </p>
+
+                            @if ($reservasi->status == 'done' || ($reservasi->status == 'confirmed' && now()->gt($reservationDateTime)))
+                                <div class="mt-2">
+                                    @php
+                                        $hasReview = App\Models\Ulasan::where('id_reservasi', $reservasi->id)
+                                            ->where('id_user', auth()->id())
+                                            ->exists();
+                                    @endphp
+
+                                    @if ($hasReview)
+                                        <span class="badge badge-success">Ulasan Telah Diberikan</span>
+                                    @else
+                                        <button class="btn btn-success btn-sm review-button"
+                                            data-id="{{ $reservasi->id }}">
+                                            <i class="fas fa-star"></i> Berikan Ulasan
+                                        </button>
+
+                                        <script>
+                                            document.querySelector('.review-button[data-id="{{ $reservasi->id }}"]').addEventListener('click', function() {
+                                                Swal.fire({
+                                                    title: 'Berikan Ulasan',
+                                                    html: `
+                                                        <div class="form-group">
+                                                            <label for="ulasan" class="text-left d-block mb-2">Bagaimana pengalaman Anda?</label>
+                                                            <textarea class="form-control" id="ulasan" rows="4" placeholder="Ceritakan pengalaman Anda..."></textarea>
+                                                        </div>
+                                                    `,
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Kirim Ulasan',
+                                                    cancelButtonText: 'Batal',
+                                                    preConfirm: () => {
+                                                        const ulasan = document.getElementById('ulasan').value;
+                                                        if (!ulasan) {
+                                                            Swal.showValidationMessage('Silakan masukkan ulasan Anda');
+                                                            return false;
+                                                        }
+                                                        return ulasan;
+                                                    }
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        const formData = new FormData();
+                                                        formData.append('id_reservasi', '{{ $reservasi->id }}');
+                                                        formData.append('id_user', '{{ auth()->id() }}');
+                                                        formData.append('ulasan', result.value);
+                                                        formData.append('_token', '{{ csrf_token() }}');
+
+                                                        Swal.fire({
+                                                            title: 'Mengirim Ulasan',
+                                                            text: 'Mohon tunggu...',
+                                                            allowOutsideClick: false,
+                                                            didOpen: () => {
+                                                                Swal.showLoading();
+                                                            }
+                                                        });
+
+                                                        fetch('{{ route('pelanggan.ulasan.submit') }}', {
+                                                                method: 'POST',
+                                                                body: formData
+                                                            })
+                                                            .then(response => response.json())
+                                                            .then(data => {
+                                                                if (data.success) {
+                                                                    Swal.fire({
+                                                                        title: 'Berhasil!',
+                                                                        text: 'Terima kasih atas ulasan Anda',
+                                                                        icon: 'success'
+                                                                    }).then(() => {
+                                                                        window.location.reload();
+                                                                    });
+                                                                } else {
+                                                                    Swal.fire({
+                                                                        title: 'Error!',
+                                                                        text: data.message ||
+                                                                            'Terjadi kesalahan saat mengirim ulasan',
+                                                                        icon: 'error'
+                                                                    });
+                                                                }
+                                                            })
+                                                            .catch(error => {
+                                                                Swal.fire({
+                                                                    title: 'Error!',
+                                                                    text: 'Terjadi kesalahan saat mengirim ulasan',
+                                                                    icon: 'error'
+                                                                });
+                                                            });
+                                                    }
+                                                });
+                                            });
+                                        </script>
+                                    @endif
+                                </div>
+                            @endif
 
                         </div>
                     </div>

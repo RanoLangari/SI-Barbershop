@@ -187,9 +187,28 @@
                     </div>
                 </div>
             @else
-                <div class="text-center py-5 bg-white shadow rounded">
-                    <i class="far fa-comment-dots fa-3x mb-3 text-muted"></i>
-                    <p class="mb-0">Belum ada ulasan dari pelanggan.</p>
+                <div class="empty-reviews position-relative">
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                        <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(249, 168, 37, 0.05) 0%, rgba(255, 143, 0, 0.1) 100%);"></div>
+                        <div class="card-body p-5 text-center">
+                            <div class="icon-container mb-4">
+                                <div class="icon-wrapper d-inline-flex align-items-center justify-content-center rounded-circle p-3" 
+                                     style="background: linear-gradient(45deg, #f9a825, #ff8f00); box-shadow: 0 10px 20px rgba(249, 168, 37, 0.2);">
+                                    <i class="fas fa-star-half-alt fa-2x text-white"></i>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold mb-3">Belum Ada Ulasan</h3>
+                            <p class="text-muted mb-4 px-md-5">Jadilah yang pertama berbagi pengalaman Anda di ZeroSeven Barbershop dan bantu orang lain menemukan gaya terbaik mereka.</p>
+                            <a href="{{ route('pelanggan.reservasi') }}" class="btn btn-lg px-4 py-2 text-white position-relative" 
+                               style="background: linear-gradient(45deg, #f9a825, #ff8f00); box-shadow: 0 4px 12px rgba(249, 168, 37, 0.3); overflow: hidden;">
+                                <span class="position-relative z-1">
+                                    <i class="fas fa-cut me-2"></i>Reservasi & Beri Ulasan
+                                </span>
+                                <div class="position-absolute top-0 start-0 w-100 h-100 z-0" style="background: linear-gradient(45deg, #ff8f00, #f9a825); opacity: 0; transition: opacity 0.3s ease;" 
+                                     onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0"></div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>
