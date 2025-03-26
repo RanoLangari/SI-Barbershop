@@ -26,6 +26,7 @@ class BarbermanController extends Controller
         $data = $request->all();
         $data['role'] = 'barberman';
         $data['password'] = bcrypt('password123');
+        $data['verified'] = 1;
 
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('barberman_fotos', 'public');
