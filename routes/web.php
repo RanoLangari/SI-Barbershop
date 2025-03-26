@@ -30,6 +30,7 @@ use App\Http\Controllers\Pelanggan\ProfileController as PelangganProfileControll
 use App\Http\Controllers\Pelanggan\RefundController as PelangganRefundController;
 use App\Http\Controllers\Pelanggan\RiwayatController;
 use App\Http\Controllers\RefundController;
+use App\Http\Controllers\UlasanController;
 
 Route::get('/', function () {
     return view('landing-page');
@@ -129,4 +130,5 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::post('/pelanggan/riwayat/refund/{reservasi}', [PelangganRefundController::class, 'store'])->name('pelanggan.refund');
     Route::post('/pelanggan/reschedule', [PelangganController::class, 'reschedule'])->name('pelanggan.reschedule');
     Route::put('/pelanggan/profile/update', [PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
+    Route::post('/pelanggan/ulasan/submit', [UlasanController::class, 'submitUlasan'])->name('pelanggan.ulasan.submit');
 });
