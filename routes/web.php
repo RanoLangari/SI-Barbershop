@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 // Middleware
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -30,14 +31,64 @@ use App\Http\Controllers\Pelanggan\ProfileController as PelangganProfileControll
 use App\Http\Controllers\Pelanggan\RefundController as PelangganRefundController;
 use App\Http\Controllers\Pelanggan\RiwayatController;
 use App\Http\Controllers\RefundController;
+use App\Http\Controllers\UlasanController;
+use App\Models\Ulasan;
 
 Route::get('/', function () {
-    return view('landing-page');
+    try {
+        // Query the database for ulasan records with eager loading of relationships
+        $ulasanData = \App\Models\Ulasan::with(['reservasi', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Add detailed logging for debugging
+        Log::info('Landing page: Fetched ' . $ulasanData->count() . ' ulasan records');
+
+        foreach ($ulasanData as $ulasan) {
+            Log::info('Ulasan ID: ' . $ulasan->id .
+                ', User: ' . ($ulasan->user ? $ulasan->user->name : 'No user') .
+                ', Has Photo: ' . ($ulasan->user && $ulasan->user->foto ? 'Yes' : 'No') .
+                ', Review Text: ' . substr($ulasan->ulasan, 0, 30) . '...');
+        }
+
+        // Pass data explicitly to the view
+        return view('landing-page', [
+            'ulasanData' => $ulasanData
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error on landing page: ' . $e->getMessage());
+        return view('landing-page', ['ulasanData' => collect()]);
+    }
 });
 
 Route::get('/about', function () {
-    return view('about');
-})->name('about');
+    try {
+        // Query the database for ulasan records with eager loading of relationships
+        $ulasanData = \App\Models\Ulasan::with(['reservasi', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Add detailed logging for debugging
+        Log::info('About page: Fetched ' . $ulasanData->count() . ' ulasan records');
+
+        foreach ($ulasanData as $ulasan) {
+            Log::info('Ulasan ID: ' . $ulasan->id .
+                ', User: ' . ($ulasan->user ? $ulasan->user->name : 'No user') .
+                ', Has Photo: ' . ($ulasan->user && $ulasan->user->foto ? 'Yes' : 'No') .
+                ', Review Text: ' . substr($ulasan->ulasan, 0, 30) . '...');
+        }
+
+        // Pass data explicitly to the view
+        return view('about', [
+            'ulasanData' => $ulasanData
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error on about page: ' . $e->getMessage());
+        return view('about', ['ulasanData' => collect()]);
+    }
+});
 
 Route::get('/layanan', function () {
     return view('layanan');
@@ -65,6 +116,8 @@ Route::post('/register', [AuthController::class, 'registerPelanggan'])->name('re
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/user/verify/{token}', [AuthController::class, 'verify'])->name('verify');
 
+// Add this route for ulasan
+Route::get('/ulasan', [UlasanController::class, 'getAllUlasan'])->name('ulasan.all');
 
 // Admin Routes
 
@@ -127,5 +180,7 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::post('/pelanggan/riwayat/pay/{reservasi}', [RiwayatController::class, 'pay'])->name('pelanggan.riwayat.pay');
     Route::post('/pelanggan/riwayat/cancel/{reservasi}', [RiwayatController::class, 'cancel'])->name('pelanggan.riwayat.cancel');
     Route::post('/pelanggan/riwayat/refund/{reservasi}', [PelangganRefundController::class, 'store'])->name('pelanggan.refund');
+    Route::post('/pelanggan/reschedule', [PelangganController::class, 'reschedule'])->name('pelanggan.reschedule');
     Route::put('/pelanggan/profile/update', [PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
+    Route::post('/pelanggan/ulasan/submit', [UlasanController::class, 'submitUlasan'])->name('pelanggan.ulasan.submit');
 });

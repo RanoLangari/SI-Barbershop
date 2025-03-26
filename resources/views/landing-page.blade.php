@@ -61,83 +61,7 @@
 
 
 
-    <!-- testimonail-section -->
-    <div class="testimonail-section mt-150 mb-150" style="background-color: #f0f0f0;">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-10 offset-lg-1 text-center">
-                    <div class="testimonial-sliders owl-carousel owl-theme">
-                        <div class="single-testimonial-slider">
-                            <div class="client-avater">
-                                <img src="assets/img/avaters/avatar1.png" alt="">
-                            </div>
-                            <div class="client-meta">
-                                <h3>Saira Hakim <span>Pelanggan Setia</span></h3>
-                                <p class="testimonial-body">
-                                    " ZeroSeven Barbershop memberikan pelayanan yang luar biasa. Saya selalu puas dengan
-                                    hasil potongan rambut saya. "
-                                </p>
-                                <div class="last-icon">
-                                    <i class="fas fa-quote-right"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="single-testimonial-slider">
-                            <div class="client-avater">
-                                <img src="assets/img/avaters/avatar2.png" alt="">
-                            </div>
-                            <div class="client-meta">
-                                <h3>David Niph <span>Pelanggan Setia</span></h3>
-                                <p class="testimonial-body">
-                                    " Pelayanan di ZeroSeven Barbershop sangat profesional dan ramah. Saya sangat
-                                    merekomendasikan tempat ini. "
-                                </p>
-                                <div class="last-icon">
-                                    <i class="fas fa-quote-right"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="single-testimonial-slider">
-                            <div class="client-avater">
-                                <img src="assets/img/avaters/avatar3.png" alt="">
-                            </div>
-                            <div class="client-meta">
-                                <h3>Jacob Sikim <span>Pelanggan Setia</span></h3>
-                                <p class="testimonial-body">
-                                    " Setiap kali saya datang ke ZeroSeven Barbershop, saya selalu mendapatkan hasil
-                                    yang memuaskan. Tempat ini sangat direkomendasikan. "
-                                </p>
-                                <div class="last-icon">
-                                    <i class="fas fa-quote-right"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- end testimonail-section -->
 
-    <script>
-        $(document).ready(function(){
-            $(".testimonial-sliders").owlCarousel({
-                items: 1,
-                loop: true,
-                autoplay: true,
-                autoplayTimeout: 5000,
-                animateOut: 'fadeOut',
-                animateIn: 'fadeIn',
-                smartSpeed: 450,
-                onTranslated: function(event) {
-                    var items = event.item.count;
-                    var item = event.item.index;
-                    $('.owl-item').removeClass('animated');
-                    $('.owl-item').eq(item).addClass('animated');
-                }
-            });
-        });
-    </script>
 
     <!-- advertisement section -->
     <div class="abt-section mb-150">
@@ -202,5 +126,74 @@
     </div>
     <!-- end layanan section -->
 
+    <!-- testimonial section -->
+    <div class="testimonial-section py-5" style="background-color: #f7f7f7;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2 text-center mb-5">
+                    <div class="section-title">
+                        <h3><span class="orange-text">Ulasan</span> Pelanggan</h3>
+                        <p>Apa yang dikatakan pelanggan tentang pengalaman mereka bersama kami</p>
+                    </div>
+                </div>
+            </div>
+            
+            @if (isset($ulasanData) && $ulasanData->count() > 0)
+                <div class="testimonial-slider">
+                    <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                        <div class="carousel-inner">
+                            @foreach ($ulasanData as $index => $ulasan)
+                                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                    <div class="testimonial-card mx-auto" style="max-width: 700px;">
+                                        <div class="bg-white shadow rounded p-5 position-relative">
+                                            <div class="quote-icon position-absolute" style="top: 20px; left: 20px; opacity: 0.1">
+                                                <i class="fas fa-quote-left fa-4x text-warning"></i>
+                                            </div>
+                                            <div class="text-center mb-4">
+                                                <div class="mx-auto mb-4">
+                                                    @if ($ulasan->user && $ulasan->user->foto)
+                                                        <img src="{{ asset('storage/' . $ulasan->user->foto) }}" alt="{{ $ulasan->user->name }}" 
+                                                            class="rounded-circle border border-3 border-warning shadow" style="width: 100px; height: 100px; object-fit: cover;">
+                                                    @else
+                                                        <div class="rounded-circle bg-gradient d-flex align-items-center justify-content-center mx-auto border border-3 border-warning shadow" 
+                                                            style="width: 100px; height: 100px; background: linear-gradient(45deg, #f9a825, #ff8f00);">
+                                                            <i class="fa fa-user fa-3x text-white"></i>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <h4 class="mb-1 fw-bold">{{ $ulasan->user ? $ulasan->user->name : 'Pengguna' }}</h4>
+                                                <small class="text-muted">{{ $ulasan->created_at->format('d M Y') }}</small>
+                                            </div>
+                                            <div class="testimonial-text text-center mb-3">
+                                                <p class="fs-5 fst-italic">"{{ $ulasan->ulasan }}"</p>
+                                                <div class="rating mt-2">
+                                                    @for ($i = 0; $i < 5; $i++)
+                                                        <i class="fas fa-star {{ $i < ($ulasan->rating ?? 5) ? 'text-warning' : 'text-muted' }}"></i>
+                                                    @endfor
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="carousel-indicators position-relative mt-4">
+                            @foreach ($ulasanData as $index => $ulasan)
+                                <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="{{ $index }}" 
+                                    class="{{ $index === 0 ? 'active' : '' }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}" 
+                                    aria-label="Slide {{ $index + 1 }}" style="width: 12px; height: 12px; border-radius: 50%; background-color: #f9a825;"></button>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="text-center py-5 bg-white shadow rounded">
+                    <i class="far fa-comment-dots fa-3x mb-3 text-muted"></i>
+                    <p class="mb-0">Belum ada ulasan dari pelanggan.</p>
+                </div>
+            @endif
+        </div>
+    </div>
+    <!-- end testimonial section -->
 
 </x-layout>

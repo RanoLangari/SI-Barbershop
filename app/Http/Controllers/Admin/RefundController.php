@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Jadwal;
 use App\Models\Refund;
+use App\Models\Reservasi;
 use Illuminate\Http\Request;
 
 class RefundController extends Controller
@@ -32,6 +34,21 @@ class RefundController extends Controller
             }
 
             $refund->save();
+
+            // hapus jadwal
+            if ($refund->status == 'success') {
+                $reservasi = Reservasi::findOrFail($refund->id_reservasi);
+                $idJadwal = $reservasi->id_jadwal;
+                $jadwal = Jadwal::findOrFail($idJadwal);
+                $jadwal->status = false;
+                $jadwal->save();
+            } else {
+                $reservasi = Reservasi::findOrFail($refund->id_reservasi);
+                $idJadwal = $reservasi->id_jadwal;
+                $jadwal = Jadwal::findOrFail($idJadwal);
+                $jadwal->status = true;
+                $jadwal->save();
+            }
 
             return response()->json(['message' => 'Refund berhasil diupdate'], 200);
         } catch (\Exception $e) {

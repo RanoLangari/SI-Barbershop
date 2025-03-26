@@ -17,6 +17,7 @@ use Midtrans\Snap;
 use Midtrans\Notification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Psy\Command\WhereamiCommand;
 
 class ReservasiController extends Controller
 {
@@ -55,7 +56,7 @@ class ReservasiController extends Controller
     public function getBarbermanSchedule(Request $request, $barbermanId)
     {
         $jadwal = Jadwal::where('id_barberman', $barbermanId)
-            ->where('tanggal', $request->tanggal)
+            ->where('tanggal', $request->tanggal)->where('status', true)
             ->get(['jam_mulai', 'jam_selesai']);
 
         // Get all possible time slots (9:00 - 21:00) with 2-hour intervals

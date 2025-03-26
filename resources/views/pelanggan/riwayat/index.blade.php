@@ -146,10 +146,212 @@
                                                         </div>
                                                     @endif
                                                 @else
-                                                    <button class="btn btn-info btn-sm refund-button"
-                                                        data-id="{{ $reservasi->id }}">
-                                                        <i class="fas fa-undo-alt"></i> Ajukan Refund
-                                                    </button>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-info btn-sm refund-button mr-2"
+                                                            data-id="{{ $reservasi->id }}">
+                                                            <i class="fas fa-undo-alt"></i> Ajukan Refund
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm reschedule-button-custom"
+                                                            data-id="{{ $reservasi->id }}"
+                                                            data-barberman="{{ $reservasi->barberman->id }}"
+                                                            data-tanggal="{{ $reservationDate }}"
+                                                            data-jadwal="{{ $reservasi->jadwal->id }}">
+                                                            <i class="fas fa-calendar-alt"></i> Reschedule
+                                                        </button>
+
+                                                        <script>
+                                                            document.addEventListener('DOMContentLoaded', function() {
+                                                                document.querySelectorAll('.reschedule-button-custom').forEach(button => {
+                                                                    button.addEventListener('click', function() {
+                                                                        const reservasiId = this.dataset.id;
+                                                                        const barbermanId = this.dataset.barberman;
+
+                                                                        // Set minimum date to tomorrow
+                                                                        const today = new Date();
+                                                                        const tomorrow = new Date(today);
+                                                                        tomorrow.setDate(tomorrow.getDate() + 1);
+                                                                        const minDate = tomorrow.toISOString().split('T')[0];
+
+                                                                        // Initial step - Select date
+                                                                        Swal.fire({
+                                                                            title: 'Reschedule Reservasi',
+                                                                            html: `
+                                                                                <form id="rescheduleForm">
+                                                                                    <input type="hidden" id="swal_reservasi_id" value="${reservasiId}">
+                                                                                    <input type="hidden" id="swal_barberman_id" value="${barbermanId}">
+                                                                                    <div class="form-group">
+                                                                                        <label for="swal_tanggal" class="text-left d-block mb-2">Pilih Tanggal Baru</label>
+                                                                                        <input type="date" class="form-control" id="swal_tanggal" min="${minDate}" required>
+                                                                                    </div>
+                                                                                </form>
+                                                                            `,
+                                                                            showCancelButton: true,
+                                                                            confirmButtonText: 'Lanjutkan',
+                                                                            cancelButtonText: 'Batal',
+                                                                            showLoaderOnConfirm: true,
+                                                                            preConfirm: () => {
+                                                                                const tanggal = document.getElementById('swal_tanggal')
+                                                                                    .value;
+                                                                                if (!tanggal) {
+                                                                                    Swal.showValidationMessage(
+                                                                                        'Pilih tanggal terlebih dahulu');
+                                                                                    return false;
+                                                                                }
+                                                                                return tanggal;
+                                                                            },
+                                                                        }).then((result) => {
+                                                                            if (result.isConfirmed) {
+                                                                                const tanggal = result.value;
+                                                                                loadTimeSlots(barbermanId, tanggal, reservasiId);
+                                                                            }
+                                                                        });
+                                                                    });
+                                                                });
+
+                                                                // Function to load available time slots
+                                                                function loadTimeSlots(barbermanId, date, reservasiId) {
+                                                                    Swal.fire({
+                                                                        title: 'Memuat Jadwal',
+                                                                        html: '<i class="fas fa-spinner fa-spin"></i>',
+                                                                        showConfirmButton: false,
+                                                                        allowOutsideClick: false
+                                                                    });
+
+                                                                    fetch(`/get-barberman-schedule/${barbermanId}?tanggal=${date}`)
+                                                                        .then(response => response.json())
+                                                                        .then(slots => {
+                                                                            if (slots.length === 0) {
+                                                                                Swal.fire({
+                                                                                    icon: 'error',
+                                                                                    title: 'Tidak Tersedia',
+                                                                                    text: 'Tidak ada jadwal tersedia pada tanggal ini'
+                                                                                });
+                                                                                return;
+                                                                            }
+
+                                                                            let timeSlotHtml = '<div class="form-group">' +
+                                                                                '<label class="text-left d-block mb-2">Pilih Waktu Baru</label>' +
+                                                                                '<div class="d-flex flex-wrap justify-content-center" style="gap: 10px;">';
+
+                                                                            slots.forEach(slot => {
+                                                                                const disabled = !slot.available ? 'disabled' : '';
+                                                                                const btnClass = slot.available ? 'btn-outline-primary' :
+                                                                                    'btn-danger text-white';
+                                                                                // Handle both object formats - either with id/jam_mulai/jam_selesai or with time/available
+                                                                                if (slot.jam_mulai && slot.jam_selesai) {
+                                                                                    timeSlotHtml += `
+                                                                                        <div class="form-check">
+                                                                                            <input class="btn-check" type="radio" name="jadwal" 
+                                                                                                id="slot_${slot.id}" value="${slot.id}" ${disabled}>
+                                                                                            <label class="btn ${btnClass}" for="slot_${slot.id}">
+                                                                                                ${slot.jam_mulai} - ${slot.jam_selesai}
+                                                                                                ${!slot.available ? ' (Terisi)' : ''}
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    `;
+                                                                                } else {
+                                                                                    // Handle the new format with just time and available
+                                                                                    const slotTime = slot.time;
+                                                                                    // Calculate end time (assume 1 hour duration)
+                                                                                    const [hours, minutes] = slotTime.split(':');
+                                                                                    const endTime =
+                                                                                        `${(parseInt(hours) + 1).toString().padStart(2, '0')}:${minutes}`;
+
+                                                                                    timeSlotHtml += `
+                                                                                        <div class="form-check">
+                                                                                            <input class="btn-check" type="radio" name="jadwal" 
+                                                                                                id="slot_${slotTime}" value="${slotTime}" ${disabled}>
+                                                                                            <label class="btn ${btnClass}" for="slot_${slotTime}">
+                                                                                                ${slotTime} - ${endTime}
+                                                                                                ${!slot.available ? ' (Terisi)' : ''}
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    `;
+                                                                                }
+                                                                            });
+
+                                                                            timeSlotHtml += '</div></div>';
+
+                                                                            Swal.fire({
+                                                                                title: 'Pilih Waktu',
+                                                                                html: timeSlotHtml,
+                                                                                showCancelButton: true,
+                                                                                confirmButtonText: 'Konfirmasi Reschedule',
+                                                                                cancelButtonText: 'Batal',
+                                                                                preConfirm: () => {
+                                                                                    const selectedSlot = document.querySelector(
+                                                                                        'input[name="jadwal"]:checked');
+                                                                                    if (!selectedSlot) {
+                                                                                        Swal.showValidationMessage('Pilih waktu terlebih dahulu');
+                                                                                        return false;
+                                                                                    }
+                                                                                    return selectedSlot.value;
+                                                                                },
+                                                                            }).then((result) => {
+                                                                                if (result.isConfirmed) {
+                                                                                    submitReschedule(reservasiId, date, result.value);
+                                                                                }
+                                                                            });
+                                                                        })
+                                                                        .catch(error => {
+                                                                            Swal.fire({
+                                                                                icon: 'error',
+                                                                                title: 'Error',
+                                                                                text: 'Gagal memuat jadwal. Silakan coba lagi.'
+                                                                            });
+                                                                        });
+                                                                }
+
+                                                                // Function to submit reschedule request
+                                                                function submitReschedule(reservasiId, tanggal, jadwalId) {
+                                                                    Swal.fire({
+                                                                        title: 'Harap Tunggu',
+                                                                        text: 'Sedang memproses perubahan jadwal...',
+                                                                        allowOutsideClick: false,
+                                                                        didOpen: () => {
+                                                                            Swal.showLoading();
+                                                                        }
+                                                                    });
+
+                                                                    const formData = new FormData();
+                                                                    formData.append('reservasi_id', reservasiId);
+                                                                    formData.append('tanggal', tanggal);
+                                                                    formData.append('jam_mulai', jadwalId);
+                                                                    formData.append('_token', '{{ csrf_token() }}');
+
+                                                                    fetch('{{ route('pelanggan.reschedule') }}', {
+                                                                            method: 'POST',
+                                                                            body: formData
+                                                                        })
+                                                                        .then(response => response.json())
+                                                                        .then(data => {
+                                                                            if (data.status === 'success') {
+                                                                                Swal.fire({
+                                                                                    icon: 'success',
+                                                                                    title: 'Berhasil!',
+                                                                                    text: 'Jadwal reservasi berhasil diubah',
+                                                                                }).then(() => {
+                                                                                    window.location.reload();
+                                                                                });
+                                                                            } else {
+                                                                                Swal.fire({
+                                                                                    icon: 'error',
+                                                                                    title: 'Gagal!',
+                                                                                    text: data.message || 'Terjadi kesalahan saat mengubah jadwal'
+                                                                                });
+                                                                            }
+                                                                        })
+                                                                        .catch(error => {
+                                                                            Swal.fire({
+                                                                                icon: 'error',
+                                                                                title: 'Error',
+                                                                                text: 'Terjadi kesalahan saat memproses permintaan'
+                                                                            });
+                                                                        });
+                                                                }
+                                                            });
+                                                        </script>
+                                                    </div>
                                                 @endif
                                             @endif
                                         </div>
@@ -237,12 +439,11 @@
                                                 });
                                             });
                                         </script>
-                                    @elseif ($reservasi->status == 'canceled')
-                                        <span class="badge badge-danger">
-                                            Dibatalkan</span>
-                                    @elseif ($reservasi->status == 'done')
-                                        <span class="badge badge-primary">Selesai</span>
                                     @endif
+                                @elseif ($reservasi->status == 'canceled')
+                                    <span class="badge badge-danger">Dibatalkan</span>
+                                @elseif ($reservasi->status == 'done')
+                                    <span class="badge badge-primary">Selesai</span>
                                 @endif
                             </p>
 
@@ -425,4 +626,6 @@
             });
         });
     </script>
+
+
 </x-layout>
