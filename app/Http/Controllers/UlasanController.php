@@ -20,8 +20,8 @@ class UlasanController extends Controller
             $ulasan = Ulasan::create([
                 'id_reservasi' => $request->id_reservasi,
                 'id_user' => $request->id_user,
-                'ulasan' => $request->ulasan,
-                'tanggal_ulasan' => now()
+                'ulasan' => $request->ulasan
+                // Laravel will auto-fill created_at timestamp
             ]);
 
             return response()->json([
@@ -46,6 +46,20 @@ class UlasanController extends Controller
     {
         try {
             $ulasan = Ulasan::with(['user', 'reservasi'])->get();
+
+            // Transform data to include full photo URL and user name
+            $ulasan = $ulasan->map(function ($item) {
+                if ($item->user) {
+                    // Add user name
+                    $item->nama_user = $item->user->name;
+
+                    // Add photo URL if available
+                    if ($item->user->foto) {
+                        $item->user->foto_url = asset('storage/' . $item->user->foto);
+                    }
+                }
+                return $item;
+            });
 
             return response()->json([
                 'success' => true,
