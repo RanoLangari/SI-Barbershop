@@ -158,6 +158,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:barberman'])->group(function () {
 
     Route::get('/barberman/dashboard', [BarbermanDashboardController::class, 'index'])->name('barberman.dashboard');
+    Route::get('/barberman/dashboard/revenue', [BarbermanDashboardController::class, 'getRevenueData'])->name('barberman.dashboard.revenue');
     Route::get('/barberman/jadwal', [BarbermanJadwalController::class, 'index'])->name('barberman.jadwal');
     Route::get('/barberman/profile', [BarbermanProfileController::class, 'index'])->name('barberman.profile');
     Route::put('/barberman/profile/update', [BarbermanProfileController::class, 'update'])->name('barberman.profile.update');
@@ -167,10 +168,9 @@ Route::middleware(['auth', 'role:barberman'])->group(function () {
 
 
 Route::middleware(['auth', 'role:pelanggan'])->group(function () {
-
-
     Route::get('/pelanggan/reservasi', [PelangganReservasiController::class, 'index'])->name('pelanggan.reservasi');
     Route::get('/get-layanan-by-kategori/{kategori_id}', [PelangganReservasiController::class, 'getLayananByKategori']);
+    Route::get('/get-layanan-detail/{layanan_id}', [PelangganReservasiController::class, 'getLayananDetail']); // New route for layanan details
     Route::get('/get-barberman', [PelangganReservasiController::class, 'getBarberman']);
     Route::get('/get-barberman-schedule/{barbermanId}', [PelangganReservasiController::class, 'getBarbermanSchedule']);
     Route::post('/checkout', [PelangganReservasiController::class, 'checkout'])->name('checkout');
@@ -183,4 +183,5 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::post('/pelanggan/reschedule', [PelangganController::class, 'reschedule'])->name('pelanggan.reschedule');
     Route::put('/pelanggan/profile/update', [PelangganProfileController::class, 'update'])->name('pelanggan.profile.update');
     Route::post('/pelanggan/ulasan/submit', [UlasanController::class, 'submitUlasan'])->name('pelanggan.ulasan.submit');
+    Route::get('/check-existing-reservation', [PelangganReservasiController::class, 'checkExistingReservation'])->name('check.existing.reservation');
 });

@@ -45,6 +45,22 @@ class ReservasiController extends Controller
         return response()->json($layanan);
     }
 
+    public function getLayananDetail($layanan_id)
+    {
+        try {
+            $layanan = Layanan::with('kategori')->findOrFail($layanan_id);
+            return response()->json([
+                'success' => true,
+                'data' => $layanan
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Layanan tidak ditemukan'
+            ], 404);
+        }
+    }
+
     public function getBarberman()
     {
         $barberman = User::where('role', 'barberman')
@@ -82,6 +98,37 @@ class ReservasiController extends Controller
         }
 
         return response()->json($availableSlots);
+    }
+
+    public function checkExistingReservation(Request $request)
+    {
+        try {
+            $userId = auth()->id();
+            $tanggal = $request->tanggal;
+
+            // Check if user has any reservation on the same date
+            $existingReservation = Reservasi::where('id_user', $userId)
+                ->where('tanggal_reservasi', $tanggal)
+                ->whereIn('status', ['pending', 'confirmed', 'processing'])
+                ->first();
+
+            if ($existingReservation) {
+                return response()->json([
+                    'exists' => true,
+                    'message' => 'Anda sudah memiliki reservasi pada tanggal yang sama'
+                ]);
+            }
+
+            return response()->json([
+                'exists' => false
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error checking existing reservation: ' . $e->getMessage());
+            return response()->json([
+                'error' => true,
+                'message' => 'Terjadi kesalahan saat memeriksa reservasi yang ada'
+            ], 500);
+        }
     }
 
     public function checkout(Request $request)

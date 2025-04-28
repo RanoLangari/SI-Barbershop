@@ -7,10 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reservasi extends Model
 {
-    /** @use HasFactory<\Database\Factories\ReservasiFactory> */
     use HasFactory;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'reservasi';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'kategori_id',
         'id_layanan',
@@ -22,40 +32,51 @@ class Reservasi extends Model
         'status'
     ];
 
-
-    public function kategori_layanan()
-    {
-        return $this->belongsTo(Kategori_layanan::class, 'kategori_id');
-    }
-
-
-    public function layanan()
-    {
-        return $this->belongsTo(Layanan::class, 'id_layanan');
-    }
-
-    public function barberman()
-    {
-        return $this->belongsTo(User::class, 'id_barberman');
-    }
-
+    /**
+     * Get the user (customer) that owns the reservation.
+     */
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user');
     }
 
-    public function jadwal()
+    /**
+     * Get the barberman assigned to the reservation.
+     */
+    public function barberman()
     {
-        return $this->belongsTo(Jadwal::class, 'id_jadwal');
+        return $this->belongsTo(User::class, 'id_barberman');
     }
 
+    /**
+     * Get the layanan for this reservation.
+     */
+    public function layanan()
+    {
+        return $this->belongsTo(Layanan::class, 'id_layanan');
+    }
+
+    /**
+     * Get the pembayaran for this reservation.
+     */
     public function pembayaran()
     {
         return $this->belongsTo(Pembayaran::class, 'id_pembayaran');
     }
 
-    public function ulasan()
+    /**
+     * Get the kategori layanan for this reservation.
+     */
+    public function kategori()
     {
-        return $this->hasOne(Ulasan::class, 'id_reservasi');
+        return $this->belongsTo(Kategori_layanan::class, 'kategori_id');
+    }
+
+    /**
+     * Get the jadwal for this reservation.
+     */
+    public function jadwal()
+    {
+        return $this->belongsTo(Jadwal::class, 'id_jadwal');
     }
 }

@@ -105,7 +105,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                             <td class="font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {{ $item->user->name }}</td>
-                            <td>{{ $item->kategori_layanan->nama }}</td>
+                            <td>{{ $item->kategori->nama }}</td>
                             <td>{{ $item->layanan->nama }}</td>
                             <td>{{ $item->barberman->name }}</td>
                             {{-- <td>{{ $item->jadwal->tanggal }} {{ $item->jadwal->jam_mulai }} -
@@ -147,7 +147,7 @@
             const item = reservasi.find(r => r.id === id);
             const modalContent = `
                 <p><strong>Nama:</strong> ${item.user.name}</p>
-                <p><strong>Kategori Layanan:</strong> ${item.kategori_layanan.nama}</p>
+                <p><strong>Kategori Layanan:</strong> ${item.kategori.nama}</p>
                 <p><strong>Layanan:</strong> ${item.layanan.nama}</p>
                 <p><strong>Barberman:</strong> ${item.barberman.name}</p>
                 <p><strong>Jadwal:</strong> ${item.jadwal.tanggal} ${item.jadwal.jam_mulai} - ${item.jadwal.jam_selesai}</p>

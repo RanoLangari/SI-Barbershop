@@ -11,7 +11,7 @@ class LaporanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Reservasi::with('kategori_layanan', 'layanan', 'barberman', 'user', 'jadwal', 'pembayaran')
+        $query = Reservasi::with('kategori', 'layanan', 'barberman', 'user', 'jadwal', 'pembayaran')
             ->orderBy('tanggal_reservasi', 'desc');
 
         $minDate = $request->minDate;
@@ -28,7 +28,7 @@ class LaporanController extends Controller
 
     public function generatePdf(Request $request)
     {
-        $query = Reservasi::with('kategori_layanan', 'layanan', 'barberman', 'user', 'jadwal', 'pembayaran')
+        $query = Reservasi::with('kategori', 'layanan', 'barberman', 'user', 'jadwal', 'pembayaran')
             ->orderBy('tanggal_reservasi', 'desc');
 
         $minDate = $request->minDate;
