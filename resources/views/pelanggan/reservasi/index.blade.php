@@ -271,12 +271,12 @@
                                          onclick="selectService(this, ${layanan.id})">
                                         <div class="d-flex align-items-center gap-3">
                                             ${layanan.gambar ? `
-                                                                                        <div class="service-image rounded overflow-hidden" 
-                                                                                            style="width: 80px; height: 80px; margin-right: 10px;">
-                                                                                            <img src="/storage/${layanan.gambar}" alt="${layanan.nama}" 
-                                                                                                class="w-100 h-100" style="object-fit: cover;">
-                                                                                        </div>
-                                                                                    ` : ''}
+                                                                                            <div class="service-image rounded overflow-hidden" 
+                                                                                                style="width: 80px; height: 80px; margin-right: 10px;">
+                                                                                                <img src="/storage/${layanan.gambar}" alt="${layanan.nama}" 
+                                                                                                    class="w-100 h-100" style="object-fit: cover;">
+                                                                                            </div>
+                                                                                        ` : ''}
                                             <div class="service-info flex-grow-1">
                                                 <h5 class="mb-1">${layanan.nama}</h5>
                                                 <p class="text-muted mb-2" style="font-size: 1rem;">${layanan.detail}</p>
@@ -392,17 +392,17 @@
                                  onclick="selectBarberman(this, ${barberman.id})">
                                 <div class="d-flex align-items-center gap-3">
                                     ${barberman.foto ? `
-                                                                                                                                                                                                                                                                                                                                                                                        <div class="barberman-image rounded-circle overflow-hidden" 
-                                                                                                                                                                                                                                                                                                                                                                                             style="width: 80px; height: 80px; margin-right:15px;">
-                                                                                                                                                                                                                                                                                                                                                                                            <img src="/storage/${barberman.foto}" alt="${barberman.name}" 
-                                                                                                                                                                                                                                                                                                                                                                                                 class="w-100 h-100" style="object-fit: cover;">
-                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                    ` : `
-                                                                                                                                                                                                                                                                                                                                                                                        <div class="barberman-image rounded-circle bg-primary d-flex align-items-center justify-content-center"
-                                                                                                                                                                                                                                                                                                                                                                                             style="width: 80px; height: 80px;">
-                                                                                                                                                                                                                                                                                                                                                                                            <i class="fas fa-user-tie fa-2x text-white"></i>
-                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                    `}
+                                                                                                                                                                                                                                                                                                                                                                                            <div class="barberman-image rounded-circle overflow-hidden" 
+                                                                                                                                                                                                                                                                                                                                                                                                 style="width: 80px; height: 80px; margin-right:15px;">
+                                                                                                                                                                                                                                                                                                                                                                                                <img src="/storage/${barberman.foto}" alt="${barberman.name}" 
+                                                                                                                                                                                                                                                                                                                                                                                                     class="w-100 h-100" style="object-fit: cover;">
+                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                        ` : `
+                                                                                                                                                                                                                                                                                                                                                                                            <div class="barberman-image rounded-circle bg-primary d-flex align-items-center justify-content-center"
+                                                                                                                                                                                                                                                                                                                                                                                                 style="width: 80px; height: 80px;">
+                                                                                                                                                                                                                                                                                                                                                                                                <i class="fas fa-user-tie fa-2x text-white"></i>
+                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                        `}
                                     <div class="barberman-info flex-grow-1">
                                         <h5 class="mb-1">${barberman.name}</h5>
                                     </div>
@@ -464,25 +464,51 @@
                 </div>
             `;
 
-            fetch(`/get-barberman-schedule/${barbermanId}?tanggal=${date}`)
-                .then(response => response.json())
+            // Fetch barberman schedule
+            fetch(`/get-barberman-schedule/${barbermanId}?tanggal=${date}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(slots => {
                     timeSlots.innerHTML = '';
+
+                    // Check if there are any slots returned
+                    if (!Array.isArray(slots) || slots.length === 0) {
+                        timeSlots.innerHTML =
+                            `<div class="alert alert-info">Tidak ada jadwal tersedia untuk tanggal ini.</div>`;
+                        return;
+                    }
+
+                    // Create time slot elements
+                    const timeSlotContainer = document.createElement('div');
+                    timeSlotContainer.className = 'd-flex flex-wrap gap-2';
+
                     slots.forEach(slot => {
                         const timeSlotDiv = document.createElement('div');
                         timeSlotDiv.className = 'time-slot';
                         timeSlotDiv.innerHTML = `
-                            <input type="radio" class="btn-check" name="id_jadwal" 
-                                   id="time${slot.time}" value="${slot.time}" 
-                                   ${!slot.available ? 'disabled' : ''}>
-                            <label class="btn ${slot.available ? 'btn-outline-primary' : 'btn-danger text-white'}" 
-                                   for="time${slot.time}">
-                                ${slot.time}
-                                ${!slot.available ? '<br><small>(Terisi)</small>' : ''}
-                            </label>
-                        `;
-                        timeSlots.appendChild(timeSlotDiv);
+                        <input type="radio" class="btn-check" name="id_jadwal" 
+                               id="time${slot.time}" value="${slot.time}" 
+                               ${!slot.available ? 'disabled' : ''}>
+                        <label class="btn ${slot.available ? 'btn-outline-primary' : 'btn-danger text-white'}" 
+                               for="time${slot.time}">
+                            ${slot.time}
+                            ${!slot.available ? '<br><small>(Terisi)</small>' : ''}
+                        </label>
+                    `;
+                        timeSlotContainer.appendChild(timeSlotDiv);
                     });
+
+                    timeSlots.appendChild(timeSlotContainer);
 
                     // Show pay button when a time slot is selected
                     document.querySelectorAll('input[name="id_jadwal"]').forEach(radio => {
@@ -492,11 +518,13 @@
                     });
                 })
                 .catch(error => {
+                    console.error('Error fetching schedule:', error);
                     timeSlots.innerHTML = `
-                        <div class="alert alert-danger">
-                            Gagal memuat jadwal. Silakan coba lagi.
-                        </div>
-                    `;
+                    <div class="alert alert-danger">
+                        Gagal memuat jadwal. Silakan coba lagi.
+                        <br><small>${error.message || 'Unknown error'}</small>
+                    </div>
+                `;
                 });
         }
 
