@@ -187,7 +187,7 @@ class ReservasiController extends Controller
 
             // Link payment to reservation
             $reservasi->update(['id_pembayaran' => $pembayaran->id]);
-            $reservasi = Reservasi::where('id', $reservasi->id)->with('kategori_layanan', 'layanan', 'barberman', 'user', 'jadwal', 'pembayaran')->first();
+            $reservasi = Reservasi::where('id', $reservasi->id)->with('kategori', 'layanan', 'barberman', 'user', 'jadwal', 'pembayaran')->first();
 
             return response()->json(['snapToken' => $snapToken, 'OrderId' => $orderId]);
         } catch (\Exception $e) {
