@@ -24,7 +24,7 @@ class RiwayatController extends Controller
     public function index()
     {
         $RiwayatReservasi = Reservasi::where('id_user', Auth::user()->id)
-            ->with(['kategori_layanan', 'layanan', 'barberman', 'jadwal', 'pembayaran'])
+            ->with(['kategori', 'layanan', 'barberman', 'jadwal', 'pembayaran'])
             ->get();
         $Refund = Refund::whereIn('id_reservasi', $RiwayatReservasi->pluck('id'))
             ->with(['reservasi', 'pembayaran'])
