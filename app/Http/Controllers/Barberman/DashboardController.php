@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Pembayaran;
 use App\Models\Reservasi;
+use App\Models\Order;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -15,49 +16,68 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id();
-        $pelangganCount = User::where('role', 'pelanggan')->count();
-        $barbermanCount = User::where('role', 'barberman')->count();
-
-        // Get reservations assigned to the logged-in barberman
-        $totalReservasi = Reservasi::where('id_barberman', $userId)->count();
-
-        // Get payments for reservations assigned to this barberman (only completed payments)
-        $totalPendapatan = Pembayaran::whereHas('reservasi', function ($query) use ($userId) {
-            $query->where('id_barberman', $userId);
-        })->where('status', 'completed')->sum('jumlah');
-
-        $pendapatanPerTahun = Pembayaran::whereHas('reservasi', function ($query) use ($userId) {
-            $query->where('id_barberman', $userId);
-        })->where('status', 'completed')->whereYear('tanggal_pembayaran', date('Y'))->sum('jumlah');
-
-        $pendapatanPerBulan = Pembayaran::whereHas('reservasi', function ($query) use ($userId) {
-            $query->where('id_barberman', $userId);
-        })->where('status', 'completed')->whereMonth('tanggal_pembayaran', date('m'))->sum('jumlah');
-
-        $pendapatanPerHari = Pembayaran::whereHas('reservasi', function ($query) use ($userId) {
-            $query->where('id_barberman', $userId);
-        })->where('status', 'completed')->whereDate('tanggal_pembayaran', date('Y-m-d'))->sum('jumlah');
-
-        // Get recent transactions (only completed payments)
-        $recentTransactions = Pembayaran::whereHas('reservasi', function ($query) use ($userId) {
-            $query->where('id_barberman', $userId);
-        })
-            ->where('status', 'completed')
-            ->with(['reservasi.user', 'reservasi.layanan'])
-            ->orderBy('tanggal_pembayaran', 'desc')
-            ->take(5)
+        // Get data for online reservations
+        $reservasi = Reservasi::with(['user', 'layanan', 'barberman'])
+            ->where('id_barberman', auth()->id()) // Changed from barberman_id to id_barberman
             ->get();
 
-        return view('barberman.dashboard.index')
-            ->with('pelangganCount', $pelangganCount)
-            ->with('barbermanCount', $barbermanCount)
-            ->with('totalReservasi', $totalReservasi)
-            ->with('totalPendapatan', $totalPendapatan)
-            ->with('pendapatanPerTahun', $pendapatanPerTahun)
-            ->with('pendapatanPerBulan', $pendapatanPerBulan)
-            ->with('pendapatanPerHari', $pendapatanPerHari)
-            ->with('recentTransactions', $recentTransactions);
+        // Get data for offline orders
+        $orders = Order::with(['layanan', 'barberman'])
+            ->where('id_barberman', auth()->id()) // Changed from barberman_id to id_barberman
+            ->get();
+
+        // Format offline orders to match the structure expected in the view
+        $formattedOrders = $orders->map(function ($order) {
+            $order->is_offline = true;
+            return $order;
+        });
+
+        // Count values
+        $totalReservasi = $reservasi->count();
+        $totalOrder = $orders->count();
+        $totalTransaksi = $totalReservasi + $totalOrder;
+
+        // Count unique customers from both online and offline transactions
+        $onlinePelangganIds = $reservasi->pluck('user_id')->filter()->unique();
+        $onlinePelangganCount = $onlinePelangganIds->count();
+        
+        // For offline, use nama_pemesan if available, otherwise use a placeholder
+        $offlinePelangganNames = $orders->pluck('nama_pemesan')->filter()->unique();
+        $offlinePelangganCount = $offlinePelangganNames->count();
+        
+        // Total unique customers (this is an approximate count as names might not be unique)
+        $pelangganCount = $onlinePelangganCount + $offlinePelangganCount;
+        
+        // Count barbermen (adjust as needed for your application)
+        $barbermanCount = \App\Models\User::where('role', 'barberman')->count();
+
+        // Calculate total revenue
+        $pendapatanReservasi = $reservasi->sum(function ($item) {
+            return $item->layanan->harga ?? 0;
+        });
+
+        $pendapatanOrder = $orders->sum(function ($item) {
+            return $item->layanan->harga ?? 0;
+        });
+
+        $totalPendapatan = $pendapatanReservasi + $pendapatanOrder;
+
+        // Combine recent transactions
+        $allTransactions = $reservasi->concat($formattedOrders)->sortByDesc(function ($item) {
+            return $item->is_offline ?? false ? $item->tanggal : $item->tanggal_reservasi;
+        });
+
+        $recentTransactions = $allTransactions->take(10); // Get the 10 most recent transactions
+
+        return view('barberman.dashboard.index', compact(
+            'totalReservasi',
+            'totalOrder',
+            'totalTransaksi',
+            'pelangganCount',
+            'barbermanCount',
+            'totalPendapatan',
+            'recentTransactions'
+        ));
     }
 
     public function getRevenueData(Request $request)
@@ -79,11 +99,19 @@ class DashboardController extends Controller
                 $period = CarbonPeriod::create($startDate, '1 day', $endDate);
                 break;
             case 'weekly':
+                // Fix for weekly view - use ISO-8601 week numbering system
                 $startDate = $now->copy()->subWeeks(8)->startOfWeek();
                 $endDate = $now->copy()->endOfWeek();
-                $groupByFormat = 'Y-W';
-                $labelFormat = 'W';
-                $period = CarbonPeriod::create($startDate, '1 week', $endDate);
+                $groupByFormat = 'o-W'; // ISO-8601 year and week number
+                $labelFormat = '\WW'; // Week number format (W1, W2, etc.)
+                
+                // Create weekly periods manually for better control
+                $period = collect();
+                $currentDate = $startDate->copy();
+                while ($currentDate <= $endDate) {
+                    $period->add($currentDate->copy());
+                    $currentDate->addWeek();
+                }
                 break;
             case 'monthly':
                 $startDate = $now->copy()->subMonths(12)->startOfMonth();
@@ -126,8 +154,8 @@ class DashboardController extends Controller
                 break;
         }
 
-        // Get completed payments data for reservations assigned to this barberman
-        $payments = Pembayaran::whereHas('reservasi', function ($query) use ($userId) {
+        // ONLINE TRANSACTIONS - Get completed payments data
+        $onlinePayments = Pembayaran::whereHas('reservasi', function ($query) use ($userId) {
             $query->where('id_barberman', $userId);
         })
             ->where('status', 'completed')  // Only include completed payments
@@ -136,59 +164,164 @@ class DashboardController extends Controller
             ->orderBy('tanggal_pembayaran')
             ->get();
 
-        // Group payments by the selected period
-        $groupedPayments = $payments->groupBy(function ($payment) use ($groupByFormat) {
-            return Carbon::parse($payment->tanggal_pembayaran)->format($groupByFormat);
+        // OFFLINE TRANSACTIONS - Get orders within the date range
+        $offlineOrders = Order::where('id_barberman', $userId)
+            ->whereBetween('tanggal', [$startDate, $endDate])
+            ->with(['layanan', 'barberman'])
+            ->get();
+
+        // Group online payments by the selected period
+        $groupedOnlinePayments = $onlinePayments->groupBy(function ($payment) use ($groupByFormat, $filterType) {
+            $date = Carbon::parse($payment->tanggal_pembayaran);
+            return $date->format($groupByFormat);
+        });
+
+        // Group offline orders by the selected period
+        $groupedOfflineOrders = $offlineOrders->groupBy(function ($order) use ($groupByFormat, $filterType) {
+            $date = Carbon::parse($order->tanggal);
+            return $date->format($groupByFormat);
         });
 
         // Prepare chart data
         $chartData = [
             'labels' => [],
-            'values' => []
+            'onlineValues' => [],
+            'offlineValues' => [],
+            'totalValues' => []
         ];
 
         // Initialize with all dates in range, with zero values
-        foreach ($period as $date) {
-            $key = $date->format($groupByFormat);
-            $label = $date->format($labelFormat);
+        if ($filterType === 'weekly') {
+            // Special handling for weekly view
+            foreach ($period as $date) {
+                $key = $date->format($groupByFormat);
+                $label = 'Week ' . $date->format('W');
+                
+                if (!in_array($label, $chartData['labels'])) {
+                    $chartData['labels'][] = $label;
+                    $chartData['onlineValues'][] = 0;
+                    $chartData['offlineValues'][] = 0;
+                    $chartData['totalValues'][] = 0;
+                }
+            }
+        } else {
+            // Regular handling for other time periods
+            foreach ($period as $date) {
+                $key = $date->format($groupByFormat);
+                $label = $date->format($labelFormat);
 
-            if (!in_array($label, $chartData['labels'])) {
-                $chartData['labels'][] = $label;
-                $chartData['values'][] = 0;
+                if (!in_array($label, $chartData['labels'])) {
+                    $chartData['labels'][] = $label;
+                    $chartData['onlineValues'][] = 0;
+                    $chartData['offlineValues'][] = 0;
+                    $chartData['totalValues'][] = 0;
+                }
             }
         }
 
-        // Fill in actual values
-        foreach ($groupedPayments as $key => $items) {
-            $label = Carbon::createFromFormat($groupByFormat, $key)->format($labelFormat);
-            $index = array_search($label, $chartData['labels']);
+        // Fill in actual values for online transactions
+        foreach ($groupedOnlinePayments as $key => $items) {
+            $index = null;
+            
+            if ($filterType === 'weekly') {
+                // For weekly view, extract week number
+                $dateParts = explode('-', $key);
+                if (count($dateParts) === 2) {
+                    $weekNum = 'Week ' . $dateParts[1];
+                    $index = array_search($weekNum, $chartData['labels']);
+                }
+            } else {
+                // For other views, use standard formatting
+                $date = Carbon::createFromFormat($groupByFormat, $key);
+                $label = $date->format($labelFormat);
+                $index = array_search($label, $chartData['labels']);
+            }
 
-            if ($index !== false) {
-                $chartData['values'][$index] = $items->sum('jumlah');
+            if ($index !== false && $index !== null) {
+                $chartData['onlineValues'][$index] = $items->sum('jumlah');
+                $chartData['totalValues'][$index] += $items->sum('jumlah');
+            }
+        }
+
+        // Fill in actual values for offline transactions
+        foreach ($groupedOfflineOrders as $key => $items) {
+            $index = null;
+            
+            if ($filterType === 'weekly') {
+                // For weekly view, extract week number
+                $dateParts = explode('-', $key);
+                if (count($dateParts) === 2) {
+                    $weekNum = 'Week ' . $dateParts[1];
+                    $index = array_search($weekNum, $chartData['labels']);
+                }
+            } else {
+                // For other views, use standard formatting
+                $date = Carbon::createFromFormat($groupByFormat, $key);
+                $label = $date->format($labelFormat);
+                $index = array_search($label, $chartData['labels']);
+            }
+
+            if ($index !== false && $index !== null) {
+                $amount = $items->sum(function($item) {
+                    return $item->layanan->harga ?? 0;
+                });
+                $chartData['offlineValues'][$index] = $amount;
+                $chartData['totalValues'][$index] += $amount;
             }
         }
 
         // Calculate summary statistics
-        $totalRevenue = $payments->sum('jumlah');
-        $transactionCount = $payments->count();
+        $totalOnlineRevenue = $onlinePayments->sum('jumlah');
+        $totalOfflineRevenue = $offlineOrders->sum(function($item) {
+            return $item->layanan->harga ?? 0;
+        });
+        $totalRevenue = $totalOnlineRevenue + $totalOfflineRevenue;
+        
+        $onlineTransactionCount = $onlinePayments->count();
+        $offlineTransactionCount = $offlineOrders->count();
+        $transactionCount = $onlineTransactionCount + $offlineTransactionCount;
+        
         $averageRevenue = $transactionCount > 0 ? $totalRevenue / $transactionCount : 0;
 
-        // Format recent transactions for display
-        $recentTransactions = $payments->take(5)->map(function ($payment) {
-            return [
+        // Combine online and offline transactions for recent transactions display
+        $allTransactions = collect();
+        
+        // Format online transactions
+        foreach ($onlinePayments->take(5) as $payment) {
+            $allTransactions->push([
                 'id' => $payment->id,
+                'type' => 'online',
                 'customer_name' => $payment->reservasi->user->name ?? 'Unknown Customer',
                 'service_name' => $payment->reservasi->layanan->nama ?? 'Unknown Service',
                 'date' => Carbon::parse($payment->tanggal_pembayaran)->format('d M Y'),
                 'amount' => $payment->jumlah
-            ];
-        });
+            ]);
+        }
+        
+        // Format offline transactions
+        foreach ($offlineOrders->take(5) as $order) {
+            $allTransactions->push([
+                'id' => $order->id,
+                'type' => 'offline',
+                'customer_name' => $order->nama_pemesan ?? 'Walk-in Customer',
+                'service_name' => $order->layanan->nama ?? 'Unknown Service',
+                'date' => Carbon::parse($order->tanggal)->format('d M Y'),
+                'amount' => $order->layanan->harga ?? 0
+            ]);
+        }
+        
+        // Sort by date (newest first) and take only 5
+        $recentTransactions = $allTransactions->sortByDesc('date')->take(5)->values()->all();
 
         return response()->json([
             'summary' => [
                 'total' => $totalRevenue,
+                'online' => $totalOnlineRevenue,
+                'offline' => $totalOfflineRevenue,
                 'average' => $averageRevenue,
-                'count' => $transactionCount
+                'count' => $transactionCount,
+                'onlineCount' => $onlineTransactionCount,
+                'offlineCount' => $offlineTransactionCount
             ],
             'chart' => $chartData,
             'transactions' => $recentTransactions
