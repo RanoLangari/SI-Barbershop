@@ -119,21 +119,25 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($jadwal as $index => $item)
+                @forelse ($jadwal as $index => $item)
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                         <td class="font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $index + 1 }}</td>
-                        <td> 
-                            @if ($item->reservasi && $item->reservasi->first() && $item->reservasi->first()->user)
+                        <td>
+                            @if ($item->reservasi && $item->reservasi->isNotEmpty() && $item->reservasi->first() && $item->reservasi->first()->user)
                                 {{ $item->reservasi->first()->user->name }}
                             @else
-                                <span class="text-gray-400">Pelanggan Offline</span>
+                                <span class="text-gray-500"> pelanggan</span>
                             @endif
                         </td>
                         <td>{{ $item->tanggal }}</td>
                         <td>{{ $item->jam_mulai }}</td>
                         <td>{{ $item->jam_selesai }}</td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-gray-500">Tidak ada jadwal yang tersedia</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
