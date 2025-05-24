@@ -83,38 +83,42 @@
                 class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Cetak Laporan</a>
         </div>
 
-        @if ($reservasi->isEmpty())
+        @if ($allTransactions->isEmpty())
             <p class="text-center text-gray-500">Tidak ada data laporan untuk periode yang dipilih.</p>
         @else
             <table id="export-table" class="table-auto w-full">
                 <thead>
                     <tr>
                         <th>Nama</th>
+                        <th>Jenis</th>
                         <th>Kategori Layanan</th>
                         <th>Layanan</th>
                         <th>Barberman</th>
-                        {{-- <th>Jadwal</th> --}}
-                        {{-- <th>Pembayaran</th> --}}
                         <th>Harga</th>
-                        <th>Tanggal Reservasi</th>
+                        <th>Tanggal</th>
                         <th>Detail</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($reservasi as $item)
+                    @foreach ($allTransactions as $item)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                             <td class="font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                {{ $item->user->name }}</td>
+                                {{ isset($item->is_offline) ? $item->nama_pemesan : $item->user->name }}</td>
+                            <td>
+                                <span
+                                    class="px-2 py-1 rounded-md {{ isset($item->is_offline) ? 'bg-orange-500' : 'bg-blue-500' }} text-white">
+                                    {{ isset($item->is_offline) ? 'Offline' : 'Online' }}
+                                </span>
+                            </td>
                             <td>{{ $item->kategori->nama }}</td>
                             <td>{{ $item->layanan->nama }}</td>
                             <td>{{ $item->barberman->name }}</td>
-                            {{-- <td>{{ $item->jadwal->tanggal }} {{ $item->jadwal->jam_mulai }} -
-                                {{ $item->jadwal->jam_selesai }}</td>
-                            <td>{{ $item->pembayaran->status }}</td> --}}
                             <td>Rp {{ number_format($item->layanan->harga, 0, ',', '.') }}</td>
-                            <td>{{ $item->tanggal_reservasi }}</td>
+                            <td>{{ isset($item->is_offline) ? date('d-m-Y', strtotime($item->tanggal)) : date('d-m-Y', strtotime($item->tanggal_reservasi)) }}
+                            </td>
                             <td>
-                                <button onclick="openModal({{ $item->id }})"
+                                <button
+                                    onclick="openModal({{ $item->id }}, {{ isset($item->is_offline) ? 'true' : 'false' }})"
                                     class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Detail</button>
                             </td>
                         </tr>
@@ -141,20 +145,62 @@
     </div>
 
     <script>
-        function openModal(id) {
+        function openModal(id, isOffline) {
             // Fetch data using AJAX or populate modal content here
-            const reservasi = @json($reservasi);
-            const item = reservasi.find(r => r.id === id);
-            const modalContent = `
-                <p><strong>Nama:</strong> ${item.user.name}</p>
-                <p><strong>Kategori Layanan:</strong> ${item.kategori.nama}</p>
-                <p><strong>Layanan:</strong> ${item.layanan.nama}</p>
-                <p><strong>Barberman:</strong> ${item.barberman.name}</p>
-                <p><strong>Jadwal:</strong> ${item.jadwal.tanggal} ${item.jadwal.jam_mulai} - ${item.jadwal.jam_selesai}</p>
-                <p><strong>Pembayaran:</strong> <span class="px-2 py-1 rounded-md text-white ${item.pembayaran.status === 'completed' ? 'bg-green-500' : 'bg-red-500'}">${item.pembayaran.status}</span></p>
-                <p><strong>Harga:</strong> Rp ${new Intl.NumberFormat('id-ID').format(item.layanan.harga)}</p>
-                <p><strong>Tanggal Reservasi:</strong> ${item.tanggal_reservasi}</p>
-            `;
+            const allTransactions = @json($allTransactions);
+
+            // Debug to console
+            console.log('Looking for transaction ID:', id, 'isOffline:', isOffline);
+            console.log('Available transactions:', allTransactions);
+
+            // More robust item finding - using both id and type checking
+            const item = allTransactions.find(r => {
+                // Check if the IDs match and also verify if the item type matches the expected type
+                return r.id === id && ((isOffline && r.is_offline) || (!isOffline && !r.is_offline));
+            });
+
+            // Check if item was found
+            if (!item) {
+                console.error('Transaction not found:', id);
+                alert('Error: Transaction details not found.');
+                return;
+            }
+
+            console.log('Found transaction:', item);
+
+            let modalContent = '';
+
+            try {
+                if (isOffline) {
+                    modalContent = 
+                        <p><strong>Jenis Transaksi:</strong> <span class="px-2 py-1 rounded-md bg-orange-500 text-white">Offline</span></p>
+                        <p><strong>Nama:</strong> ${item.nama_pemesan || 'N/A'}</p>
+                        <p><strong>Kategori Layanan:</strong> ${item.kategori?.nama || 'N/A'}</p>
+                        <p><strong>Layanan:</strong> ${item.layanan?.nama || 'N/A'}</p>
+                        <p><strong>Barberman:</strong> ${item.barberman?.name || 'N/A'}</p>
+                        <p><strong>Metode Pembayaran:</strong> ${item.metode_pembayaran === 'tunai' ? 'Tunai' : 'Non Tunai'}</p>
+                        <p><strong>Harga:</strong> Rp ${new Intl.NumberFormat('id-ID').format(item.layanan?.harga || 0)}</p>
+                        <p><strong>Tanggal:</strong> ${item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : 'N/A'}</p>
+                        <p><strong>Jam:</strong> ${item.jam || 'N/A'}</p>
+                    ;
+                } else {
+                    modalContent = 
+                        <p><strong>Jenis Transaksi:</strong> <span class="px-2 py-1 rounded-md bg-blue-500 text-white">Online</span></p>
+                        <p><strong>Nama:</strong> ${item.user?.name || 'N/A'}</p>
+                        <p><strong>Kategori Layanan:</strong> ${item.kategori?.nama || 'N/A'}</p>
+                        <p><strong>Layanan:</strong> ${item.layanan?.nama || 'N/A'}</p>
+                        <p><strong>Barberman:</strong> ${item.barberman?.name || 'N/A'}</p>
+                        <p><strong>Jadwal:</strong> ${item.jadwal ? ${item.jadwal.tanggal} ${item.jadwal.jam_mulai} - ${item.jadwal.jam_selesai} : 'N/A'}</p>
+                        <p><strong>Pembayaran:</strong> <span class="px-2 py-1 rounded-md text-white ${item.pembayaran?.status === 'completed' ? 'bg-green-500' : 'bg-red-500'}">${item.pembayaran?.status || 'N/A'}</span></p>
+                        <p><strong>Harga:</strong> Rp ${new Intl.NumberFormat('id-ID').format(item.layanan?.harga || 0)}</p>
+                        <p><strong>Tanggal Reservasi:</strong> ${item.tanggal_reservasi ? new Date(item.tanggal_reservasi).toLocaleDateString('id-ID') : 'N/A'}</p>
+                    ;
+                }
+            } catch (error) {
+                console.error('Error creating modal content:', error);
+                modalContent = '<p class="text-red-500">Error loading transaction details. Please try again.</p>';
+            }
+
             document.getElementById('modalContent').innerHTML = modalContent;
             document.getElementById('detailModal').classList.remove('hidden');
         }

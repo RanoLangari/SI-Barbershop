@@ -178,6 +178,18 @@
                     </a>
                 </li> --}}
                 <li>
+                    <a href="{{ route('admin.order') }}"
+                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path d="M17 3H3C2.4 3 2 3.4 2 4v12c0 0.6 0.4 1 1 1h14c0.6 0 1-0.4 1-1V4c0-0.6-0.4-1-1-1zm-1 11H4V5h12v9z"/>
+                            <path d="M10 9l5-3v1.5l-5 3-5-3V6l5 3z"/>
+                        </svg>
+                        <span class="flex-1 ms-3 whitespace-nowrap">Pesan Offline</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('admin.pelanggan') }}"
                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"

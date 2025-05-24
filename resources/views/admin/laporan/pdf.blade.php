@@ -17,13 +17,11 @@
             table-layout: fixed;
             word-wrap: break-word;
             font-size: 10px;
-            /* Add this line */
         }
 
         th,
         td {
             padding: 5px;
-            /* Adjust padding */
             border: 1px solid #ddd;
             overflow: hidden;
         }
@@ -45,67 +43,101 @@
             text-align: center;
             font-size: 12px;
         }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .badge-blue {
+            background-color: #3490dc;
+        }
+
+        .badge-orange {
+            background-color: #f6993f;
+        }
+
+        .date-range {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 
 <body>
     <header>
         <h1>ZeroSeven Barbershop</h1>
-        <p>Jl. Oekam,Kupang,NTT</p>
-        <p>Email:zerosevenbarbershop@gmail.com | Tel: (021) 12345678</p>
-        <p> Tanggal: {{ $minDate }} - {{ $maxDate }}</p> <!-- Modify this line -->
+        <p>Jl. Oekam, Kupang, NTT</p>
+        <p>Email: zerosevenbarbershop@gmail.com | Tel: (021) 12345678</p>
+        <div class="date-range">
+            @if ($minDate && $maxDate)
+                Periode: {{ date('d-m-Y', strtotime($minDate)) }} - {{ date('d-m-Y', strtotime($maxDate)) }}
+            @else
+                Periode: Semua Transaksi
+            @endif
+        </div>
     </header>
 
     <h2>Laporan Keuangan</h2>
     <table>
         <thead>
             <tr>
-                <th>No</th> <!-- Add this line -->
+                <th>No</th>
                 <th>Nama</th>
+                <th>Jenis</th>
                 <th>Kategori Layanan</th>
                 <th>Layanan</th>
                 <th>Barberman</th>
-                <th>Jadwal</th>
-                <th>Tanggal Reservasi</th>
-                <th>Pembayaran</th>
+                <th>Tanggal</th>
                 <th>Harga</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($reservasi as $index => $item)
-                <!-- Modify this line -->
+            @php $totalPendapatan = 0; @endphp
+            @foreach ($allTransactions as $index => $item)
+                @php $totalPendapatan += $item->layanan->harga; @endphp
                 <tr>
-                    <td>{{ $index + 1 }}</td> <!-- Add this line -->
-                    <td>{{ $item->user->name }}</td>
-                    <td>{{ $item->kategori_layanan->nama }}</td>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ isset($item->is_offline) ? $item->nama_pemesan : $item->user->name }}</td>
+                    <td>
+                        @if (isset($item->is_offline))
+                            <span class="badge badge-orange">Offline</span>
+                        @else
+                            <span class="badge badge-blue">Online</span>
+                        @endif
+                    </td>
+                    <td>{{ $item->kategori->nama }}</td>
                     <td>{{ $item->layanan->nama }}</td>
                     <td>{{ $item->barberman->name }}</td>
-                    <td>{{ $item->jadwal->tanggal }} {{ $item->jadwal->jam_mulai }} - {{ $item->jadwal->jam_selesai }}
+                    <td>{{ isset($item->is_offline) ? date('d-m-Y', strtotime($item->tanggal)) : date('d-m-Y', strtotime($item->tanggal_reservasi)) }}
                     </td>
-                    <td>{{ $item->tanggal_reservasi }}</td>
-                    <td>{{ $item->pembayaran->status }}</td>
                     <td>{{ 'Rp ' . number_format($item->layanan->harga, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="8" style="text-align: right;"><strong>Total Pendapatan:</strong></td>
-                <td>{{ 'Rp ' . number_format($reservasi->sum('layanan.harga'), 0, ',', '.') }}</td>
+                <td colspan="7" style="text-align: right;"><strong>Total Pendapatan:</strong></td>
+                <td>{{ 'Rp ' . number_format($totalPendapatan, 0, ',', '.') }}</td>
             </tr>
         </tfoot>
     </table>
 
-    <footer>
-        <p>Page <span class="pageNumber"></span></p>
-    </footer>
+    <div style="margin-top: 20px; text-align: right;">
+        <p>Total Transaksi: {{ $allTransactions->count() }}</p>
+        <p>Total Transaksi Online:
+            {{ $allTransactions->filter(function ($item) {return !isset($item->is_offline);})->count() }}</p>
+        <p>Total Transaksi Offline:
+            {{ $allTransactions->filter(function ($item) {return isset($item->is_offline);})->count() }}</p>
+    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var pageNumber = 1;
-            document.querySelector('.pageNumber').textContent = pageNumber;
-        });
-    </script>
+    <footer>
+        <p>Dicetak pada: {{ date('d-m-Y H:i:s') }}</p>
+    </footer>
 </body>
 
 </html>

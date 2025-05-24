@@ -139,7 +139,7 @@
                                                                                 title: 'Bukti Refund',
                                                                                 imageUrl: '{{ asset(
                                                                                     '
-                                                                                                                                                                                                            uploads / refund / ' .
+                                                                                                                                                                                                                                                                                                                                                                            uploads / refund / ' .
                                                                                         $refundRecord->bukti,
                                                                                 ) }}',
                                                                                 imageAlt: 'Bukti Refund',
@@ -337,8 +337,7 @@
                                                                     formData.append('jam_mulai', jadwalId);
                                                                     formData.append('_token', '{{ csrf_token() }}');
 
-                                                                    fetch('{{ route('
-                                                                                                                                                                                        pelanggan.reschedule ') }}', {
+                                                                    fetch('/pelanggan/reschedule', {
                                                                             method: 'POST',
                                                                             body: formData
                                                                         })
@@ -427,7 +426,7 @@
                                                                 '{{ $reservasi->pembayaran
                                                                     ? $reservasi->pembayaran->id
                                                                     : '
-                                                                                                                                                                            ' }}'
+                                                                                                                                                                                                                                                                                                            ' }}'
                                                             );
                                                             formData.append('alasan', result.value);
                                                             formData.append('merchant', document.getElementById('merchant')
@@ -448,11 +447,7 @@
                                                                 }
                                                             });
 
-                                                            fetch('{{ route(
-                                                                '
-                                                                                                                                                                        pelanggan.refund ',
-                                                                $reservasi->id,
-                                                            ) }}', {
+                                                            fetch('/pelanggan/refund/{{ $reservasi->id }}', {
                                                                     method: 'POST',
                                                                     body: formData
                                                                 })
