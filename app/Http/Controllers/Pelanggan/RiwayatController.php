@@ -78,4 +78,34 @@ class RiwayatController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function refund(Request $request, Reservasi $reservasi)
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'id_reservasi' => 'required',
+                'id_pembayaran' => 'required',
+                'alasan' => 'required',
+                'merchant' => 'required',
+                'address_refund' => 'required',
+                'address_name' => 'required',
+            ]);
+
+            // Create refund record
+            $refund = new Refund();
+            $refund->id_reservasi = $request->id_reservasi;
+            $refund->id_pembayaran = $request->id_pembayaran;
+            $refund->alasan = $request->alasan;
+            $refund->merchant = $request->merchant;
+            $refund->address_refund = $request->address_refund;
+            $refund->address_name = $request->address_name;
+            $refund->status = 'pending';
+            $refund->save();
+
+            return response()->json(['status' => 'success']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
 }

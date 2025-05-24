@@ -23,11 +23,11 @@ class Layanan extends Model
      */
     protected $fillable = [
         'nama',
-        'deskripsi',
+        'detail',
         'harga',
         'durasi',
         'kategori_id',
-        'foto'
+        'gambar',
     ];
 
     /**

@@ -151,6 +151,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/refund', [AdminRefundController::class, 'index'])->name('admin.refund');
     Route::put('/admin/refund/{refund}', [AdminRefundController::class, 'update'])->name('admin.refund.update');
     Route::get('/admin/laporan/pdf', [LaporanController::class, 'generatePdf'])->name('admin.laporan.pdf');
+
+    Route::get('/admin/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('admin.order');
+    Route::post('/admin/orders', [App\Http\Controllers\OrderController::class, 'store'])->name('admin.order.store');
+    Route::put('/admin/orders/{order}', [App\Http\Controllers\OrderController::class, 'update'])->name('admin.order.update');
+    Route::delete('/admin/orders/{order}', [App\Http\Controllers\OrderController::class, 'destroy'])->name('admin.order.destroy');
 });
 
 
