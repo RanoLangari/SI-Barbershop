@@ -42,9 +42,22 @@ class LaporanController extends Controller
         });
 
         // Merge both collections
-        $allTransactions = $reservasi->concat($formattedOrders)->sortByDesc(function ($item) {
+        $mergedTransactions = $reservasi->concat($formattedOrders)->sortByDesc(function ($item) {
             return $item->is_offline ?? false ? $item->tanggal : $item->tanggal_reservasi;
         });
+
+        // Paginate the merged collection manually
+        $page = $request->input('page', 1);
+        $perPage = 15;
+        $offset = ($page - 1) * $perPage;
+        
+        $allTransactions = new \Illuminate\Pagination\LengthAwarePaginator(
+            $mergedTransactions->slice($offset, $perPage),
+            $mergedTransactions->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         return view('admin.laporan.index', compact('allTransactions', 'minDate', 'maxDate'));
     }
@@ -103,5 +116,35 @@ class LaporanController extends Controller
         $filename .= '.pdf';
         
         return $pdf->download($filename);
+    }
+
+    public function getTransactionDetail($id, Request $request)
+    {
+        $isOffline = $request->query('is_offline', 0);
+        
+        try {
+            if ($isOffline == 1) {
+                // Using Order model for offline transactions, not TransaksiOffline
+                $transaction = Order::with(['kategori', 'layanan', 'barberman', 'user'])
+                    ->findOrFail($id);
+                
+                // Add the is_offline flag to make frontend handling consistent
+                $transaction->is_offline = true;
+            } else {
+                // Online transaction
+                $transaction = Reservasi::with(['kategori', 'layanan', 'barberman', 'user', 'jadwal', 'pembayaran'])
+                    ->findOrFail($id);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'transaction' => $transaction
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }

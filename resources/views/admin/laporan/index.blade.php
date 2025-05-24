@@ -117,24 +117,33 @@
                             <td>{{ isset($item->is_offline) ? date('d-m-Y', strtotime($item->tanggal)) : date('d-m-Y', strtotime($item->tanggal_reservasi)) }}
                             </td>
                             <td>
-                                <button
-                                    onclick="openModal({{ $item->id }}, {{ isset($item->is_offline) ? 'true' : 'false' }})"
-                                    class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Detail</button>
+                                <button data-id="{{ $item->id }}"
+                                    data-offline="{{ isset($item->is_offline) ? 'true' : 'false' }}"
+                                    class="detail-btn bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Detail</button>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            <div class="mt-4">
+                {{ $allTransactions->links() }}
+            </div>
         @endif
     </div>
 
     <!-- Modal -->
     <div id="detailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div
+            class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 dark:text-white">
             <div class="mt-3 text-center">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Detail Reservasi</h3>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Detail Reservasi</h3>
                 <div class="mt-2 px-7 py-3">
-                    <p id="modalContent" class="text-sm text-gray-500"></p>
+                    <div id="modalContent" class="text-sm text-gray-500 dark:text-gray-300">
+                        <div class="flex justify-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                        </div>
+                        <p class="mt-2">Loading...</p>
+                    </div>
                 </div>
                 <div class="items-center px-4 py-3">
                     <button id="closeModal"
@@ -145,68 +154,90 @@
     </div>
 
     <script>
-        function openModal(id, isOffline) {
-            // Fetch data using AJAX or populate modal content here
-            const allTransactions = @json($allTransactions);
-
-            // Debug to console
-            console.log('Looking for transaction ID:', id, 'isOffline:', isOffline);
-            console.log('Available transactions:', allTransactions);
-
-            // More robust item finding - using both id and type checking
-            const item = allTransactions.find(r => {
-                // Check if the IDs match and also verify if the item type matches the expected type
-                return r.id === id && ((isOffline && r.is_offline) || (!isOffline && !r.is_offline));
+        // Initialize event listeners when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to all detail buttons
+            document.querySelectorAll('.detail-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = parseInt(this.dataset.id);
+                    const isOffline = this.dataset.offline === 'true';
+                    fetchTransactionDetails(id, isOffline);
+                });
             });
 
-            // Check if item was found
-            if (!item) {
-                console.error('Transaction not found:', id);
-                alert('Error: Transaction details not found.');
-                return;
-            }
-
-            console.log('Found transaction:', item);
-
-            let modalContent = '';
-
-            try {
-                if (isOffline) {
-                    modalContent = 
-                        <p><strong>Jenis Transaksi:</strong> <span class="px-2 py-1 rounded-md bg-orange-500 text-white">Offline</span></p>
-                        <p><strong>Nama:</strong> ${item.nama_pemesan || 'N/A'}</p>
-                        <p><strong>Kategori Layanan:</strong> ${item.kategori?.nama || 'N/A'}</p>
-                        <p><strong>Layanan:</strong> ${item.layanan?.nama || 'N/A'}</p>
-                        <p><strong>Barberman:</strong> ${item.barberman?.name || 'N/A'}</p>
-                        <p><strong>Metode Pembayaran:</strong> ${item.metode_pembayaran === 'tunai' ? 'Tunai' : 'Non Tunai'}</p>
-                        <p><strong>Harga:</strong> Rp ${new Intl.NumberFormat('id-ID').format(item.layanan?.harga || 0)}</p>
-                        <p><strong>Tanggal:</strong> ${item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : 'N/A'}</p>
-                        <p><strong>Jam:</strong> ${item.jam || 'N/A'}</p>
-                    ;
-                } else {
-                    modalContent = 
-                        <p><strong>Jenis Transaksi:</strong> <span class="px-2 py-1 rounded-md bg-blue-500 text-white">Online</span></p>
-                        <p><strong>Nama:</strong> ${item.user?.name || 'N/A'}</p>
-                        <p><strong>Kategori Layanan:</strong> ${item.kategori?.nama || 'N/A'}</p>
-                        <p><strong>Layanan:</strong> ${item.layanan?.nama || 'N/A'}</p>
-                        <p><strong>Barberman:</strong> ${item.barberman?.name || 'N/A'}</p>
-                        <p><strong>Jadwal:</strong> ${item.jadwal ? ${item.jadwal.tanggal} ${item.jadwal.jam_mulai} - ${item.jadwal.jam_selesai} : 'N/A'}</p>
-                        <p><strong>Pembayaran:</strong> <span class="px-2 py-1 rounded-md text-white ${item.pembayaran?.status === 'completed' ? 'bg-green-500' : 'bg-red-500'}">${item.pembayaran?.status || 'N/A'}</span></p>
-                        <p><strong>Harga:</strong> Rp ${new Intl.NumberFormat('id-ID').format(item.layanan?.harga || 0)}</p>
-                        <p><strong>Tanggal Reservasi:</strong> ${item.tanggal_reservasi ? new Date(item.tanggal_reservasi).toLocaleDateString('id-ID') : 'N/A'}</p>
-                    ;
-                }
-            } catch (error) {
-                console.error('Error creating modal content:', error);
-                modalContent = '<p class="text-red-500">Error loading transaction details. Please try again.</p>';
-            }
-
-            document.getElementById('modalContent').innerHTML = modalContent;
-            document.getElementById('detailModal').classList.remove('hidden');
-        }
-
-        document.getElementById('closeModal').addEventListener('click', function() {
-            document.getElementById('detailModal').classList.add('hidden');
+            // Close modal on click
+            document.getElementById('closeModal').addEventListener('click', function() {
+                document.getElementById('detailModal').classList.add('hidden');
+            });
         });
+
+        function fetchTransactionDetails(id, isOffline) {
+            // Display loading indicator
+            document.getElementById('modalContent').innerHTML = `
+                <div class="flex justify-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                </div>
+                <p class="mt-2">Loading...</p>
+            `;
+
+            // Show modal immediately with loading state
+            document.getElementById('detailModal').classList.remove('hidden');
+
+            console.log(`Fetching details for transaction ID: ${id}, isOffline: ${isOffline}`);
+
+            // Use the route to fetch transaction details via AJAX
+            fetch(`/admin/laporan/detail/${id}?is_offline=${isOffline ? 1 : 0}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data);
+
+                    if (data.success) {
+                        let item = data.transaction;
+                        let modalContent = '';
+
+                        if (isOffline) {
+                            modalContent = `
+                        <p class="text-left"><strong>Jenis Transaksi:</strong> <span class="px-2 py-1 rounded-md bg-orange-500 text-white">Offline</span></p>
+                        <p class="text-left"><strong>Nama:</strong> ${item.nama_pemesan || 'N/A'}</p>
+                        <p class="text-left"><strong>Kategori Layanan:</strong> ${item.kategori?.nama || 'N/A'}</p>
+                        <p class="text-left"><strong>Layanan:</strong> ${item.layanan?.nama || 'N/A'}</p>
+                        <p class="text-left"><strong>Barberman:</strong> ${item.barberman?.name || 'N/A'}</p>
+                        <p class="text-left"><strong>Metode Pembayaran:</strong> ${item.metode_pembayaran === 'tunai' ? 'Tunai' : 'Non Tunai'}</p>
+                        <p class="text-left"><strong>Harga:</strong> Rp ${new Intl.NumberFormat('id-ID').format(item.layanan?.harga || 0)}</p>
+                        <p class="text-left"><strong>Tanggal:</strong> ${item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : 'N/A'}</p>
+                        <p class="text-left"><strong>Jam:</strong> ${item.jam || 'N/A'}</p>
+                    `;
+                        } else {
+                            modalContent = `
+                        <p class="text-left"><strong>Jenis Transaksi:</strong> <span class="px-2 py-1 rounded-md bg-blue-500 text-white">Online</span></p>
+                        <p class="text-left"><strong>Nama:</strong> ${item.user?.name || 'N/A'}</p>
+                        <p class="text-left"><strong>Kategori Layanan:</strong> ${item.kategori?.nama || 'N/A'}</p>
+                        <p class="text-left"><strong>Layanan:</strong> ${item.layanan?.nama || 'N/A'}</p>
+                        <p class="text-left"><strong>Barberman:</strong> ${item.barberman?.name || 'N/A'}</p>
+                        <p class="text-left"><strong>Jadwal:</strong> ${item.jadwal ? `${item.jadwal.tanggal} ${item.jadwal.jam_mulai} - ${item.jadwal.jam_selesai}` : 'N/A'}</p>
+                        <p class="text-left"><strong>Pembayaran:</strong> <span class="px-2 py-1 rounded-md text-white ${item.pembayaran?.status === 'completed' ? 'bg-green-500' : 'bg-red-500'}">${item.pembayaran?.status || 'N/A'}</span></p>
+                        <p class="text-left"><strong>Harga:</strong> Rp ${new Intl.NumberFormat('id-ID').format(item.layanan?.harga || 0)}</p>
+                        <p class="text-left"><strong>Tanggal Reservasi:</strong> ${item.tanggal_reservasi ? new Date(item.tanggal_reservasi).toLocaleDateString('id-ID') : 'N/A'}</p>
+                    `;
+                        }
+
+                        document.getElementById('modalContent').innerHTML = modalContent;
+                    } else {
+                        document.getElementById('modalContent').innerHTML =
+                            `<p class="text-red-500">Transaction not found: ${data.message || 'Unknown error'}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching transaction details:', error);
+                    document.getElementById('modalContent').innerHTML =
+                        `<p class="text-red-500">Error loading transaction details: ${error.message}</p>
+                         <p class="text-sm mt-2">Check your controller handling for offline transactions.</p>`;
+                });
+        }
     </script>
 </x-admin-layout>
