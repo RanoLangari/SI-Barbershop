@@ -151,6 +151,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/refund', [AdminRefundController::class, 'index'])->name('admin.refund');
     Route::put('/admin/refund/{refund}', [AdminRefundController::class, 'update'])->name('admin.refund.update');
     Route::get('/admin/laporan/pdf', [LaporanController::class, 'generatePdf'])->name('admin.laporan.pdf');
+    Route::get('/admin/laporan/detail/{id}', [App\Http\Controllers\Admin\LaporanController::class, 'getTransactionDetail'])->name('admin.laporan.detail');
 
     Route::get('/admin/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('admin.order');
     Route::post('/admin/orders', [App\Http\Controllers\OrderController::class, 'store'])->name('admin.order.store');
