@@ -13,8 +13,12 @@
                         </svg>
                     </div>
                     <div class="ml-4">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">Total Reservasi</h3>
-                        <p class="mt-1 text-2xl font-semibold text-gray-900">{{ $totalReservasi }}</p>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Total Transaksi</h3>
+                        <p class="mt-1 text-2xl font-semibold text-gray-900">{{ $totalTransaksi }}</p>
+                        <div class="flex text-sm mt-1">
+                            <span class="text-blue-500 mr-2">{{ $totalReservasi }} Online</span>
+                            <span class="text-orange-500">{{ $totalOrder }} Offline</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -152,6 +156,9 @@
                                 ID</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Jenis</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Pelanggan</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -165,27 +172,46 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200" id="recent-transactions-body">
-                        @foreach ($recentTransactions as $transaction)
+                        @forelse ($recentTransactions as $transaction)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ $transaction->id }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if (isset($transaction->is_offline))
+                                        <span
+                                            class="px-2 py-1 rounded-md bg-orange-500 text-white text-xs">Offline</span>
+                                    @else
+                                        <span class="px-2 py-1 rounded-md bg-blue-500 text-white text-xs">Online</span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $transaction->reservasi->user->name }}</td>
+                                    @if (isset($transaction->is_offline))
+                                        {{ $transaction->nama_pemesan ?? 'N/A' }}
+                                    @else
+                                        {{ $transaction->user->name ?? 'N/A' }}
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $transaction->reservasi->layanan->nama }}</td>
+                                    {{ $transaction->layanan->nama ?? 'N/A' }}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $transaction->tanggal_pembayaran }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp
-                                    {{ number_format($transaction->jumlah, 0, ',', '.') }}</td>
+                                    @if (isset($transaction->is_offline))
+                                        {{ date('d-m-Y', strtotime($transaction->tanggal)) }}
+                                    @else
+                                        {{ date('d-m-Y', strtotime($transaction->tanggal_reservasi)) }}
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    Rp {{ number_format($transaction->layanan->harga ?? 0, 0, ',', '.') }}
+                                </td>
                             </tr>
-                        @endforeach
-                        @if (count($recentTransactions) == 0)
+                        @empty
                             <tr>
-                                <td colspan="5"
+                                <td colspan="6"
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Tidak ada
                                     data transaksi</td>
                             </tr>
-                        @endif
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -258,7 +284,7 @@
                 // Make AJAX request
                 fetch(
                         `/barberman/dashboard/revenue?filter=${filterType}&start_date=${startDate || ''}&end_date=${endDate || ''}`
-                        )
+                    )
                     .then(response => response.json())
                     .then(data => {
                         updateRevenueDisplay(data);
@@ -291,12 +317,30 @@
                     data: {
                         labels: data.chart.labels,
                         datasets: [{
-                            label: 'Pendapatan',
-                            data: data.chart.values,
-                            backgroundColor: 'rgba(99, 102, 241, 0.5)',
-                            borderColor: 'rgb(99, 102, 241)',
-                            borderWidth: 1
-                        }]
+                                label: 'Total',
+                                data: data.chart.totalValues,
+                                backgroundColor: 'rgba(99, 102, 241, 0.5)',
+                                borderColor: 'rgb(99, 102, 241)',
+                                borderWidth: 1,
+                                order: 3
+                            },
+                            {
+                                label: 'Online',
+                                data: data.chart.onlineValues,
+                                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                                borderColor: 'rgb(59, 130, 246)',
+                                borderWidth: 1,
+                                order: 2
+                            },
+                            {
+                                label: 'Offline',
+                                data: data.chart.offlineValues,
+                                backgroundColor: 'rgba(249, 115, 22, 0.5)',
+                                borderColor: 'rgb(249, 115, 22)',
+                                borderWidth: 1,
+                                order: 1
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
@@ -315,13 +359,38 @@
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
-                                        return 'Rp ' + formatNumber(context.parsed.y);
+                                        return context.dataset.label + ': Rp ' + formatNumber(context
+                                            .parsed.y);
                                     }
                                 }
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
                             }
                         }
                     }
                 });
+
+                // Update revenue summary cards with online/offline breakdown
+                const totalRevenueEl = document.getElementById('total-revenue');
+                totalRevenueEl.innerHTML = `
+        Rp ${formatNumber(data.summary.total)}
+        <div class="flex text-sm mt-1">
+            <span class="text-blue-500 mr-2">Online: Rp ${formatNumber(data.summary.online)}</span>
+            <span class="text-orange-500">Offline: Rp ${formatNumber(data.summary.offline)}</span>
+        </div>
+    `;
+
+                // Update transaction count with breakdown
+                const transactionCountEl = document.getElementById('transaction-count');
+                transactionCountEl.innerHTML = `
+        ${data.summary.count}
+        <div class="flex text-sm mt-1">
+            <span class="text-blue-500 mr-2">Online: ${data.summary.onlineCount}</span>
+            <span class="text-orange-500">Offline: ${data.summary.offlineCount}</span>
+        </div>
+    `;
 
                 // Update recent transactions table
                 const tbody = document.getElementById('recent-transactions-body');
@@ -330,18 +399,24 @@
                 if (data.transactions.length === 0) {
                     const row = document.createElement('tr');
                     row.innerHTML =
-                        `<td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Tidak ada data transaksi</td>`;
+                        `<td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Tidak ada data transaksi</td>`;
                     tbody.appendChild(row);
                 } else {
                     data.transactions.forEach(transaction => {
                         const row = document.createElement('tr');
+                        const typeClass = transaction.type === 'online' ? 'bg-blue-500' : 'bg-orange-500';
+                        const typeLabel = transaction.type === 'online' ? 'Online' : 'Offline';
+
                         row.innerHTML = `
-                           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${transaction.id}</td>
-                           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${transaction.customer_name}</td>
-                           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${transaction.service_name}</td>
-                           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${transaction.date}</td>
-                           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp ${formatNumber(transaction.amount)}</td>
-                       `;
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${transaction.id}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="px-2 py-1 rounded-md ${typeClass} text-white text-xs">${typeLabel}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${transaction.customer_name}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${transaction.service_name}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${transaction.date}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp ${formatNumber(transaction.amount)}</td>
+            `;
                         tbody.appendChild(row);
                     });
                 }
